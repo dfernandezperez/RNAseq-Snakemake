@@ -5,8 +5,6 @@ rule deseq2:
         "03deseq2/all.rds"
     params:
         samples=config["samples"]
-    conda:
-        "envs/deseq2.yaml"
     log:
         "00log/deseq2/init.log"
     script:
@@ -18,8 +16,6 @@ rule get_contrasts:
     output:
         table="results/diffexp/{contrast}.diffexp.tsv",
         ma_plot="results/diffexp/{contrast}.ma-plot.svg",
-    conda:
-        "envs/deseq2.yaml"
     params:
         contrast = lambda w: config["diffexp"]["contrasts"][w.contrast]
     log:
