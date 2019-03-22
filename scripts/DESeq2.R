@@ -7,17 +7,19 @@ library(DESeq2)
 library(dplyr)
 
 #------------------------- Preapre count table ------------------------------
-read_files <- lapply(snakemake@input[[1]], function(x) read.delim(x, header = TRUE))
+read_files <- lapply(snakemake@input, function(x) read.delim(x, header = TRUE))
 
-sample_names <- basename(snakemake@input[[1]]) %>%
-  gsub(pattern = ".counts", replacement = "")
+sample_names <- unlist(snakemake@input) %>%
+				basename %>%
+				gsub(pattern = ".counts", replacement = "")
+
 counts <- plyr::join_all(read_files, type='inner', by = "Geneid") %>% 
   setNames(c("GeneSymbol", sample_names)) %>%
   tibble::column_to_rownames("GeneSymbol")
 
 
 #------------------------- DESeq2 workflow ------------------------------
-colData <- read.table("samples.tsv", header=TRUE, check.names=FALSE)
+colData <- read.table("samples.tsv", header=TRUE)
 
 # Counts and colData must have the same order
 counts_ordered <- counts[as.character(colData$sample)]

@@ -22,7 +22,8 @@ SAMPLES = set(units["sample"])
 
 rule all: 
 	input:
-		"03deseq2/all.rds"
+		expand("04results/diffexp/{contrast}.diffexp.tsv", contrast = config["diffexp"]["contrasts"]),
+		"04results/pca.pdf"
 
 ##### load rules #####
 

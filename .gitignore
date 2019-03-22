@@ -3,10 +3,11 @@
 01alignments/
 02featureCounts/
 03deseq2/
+04results/
 fastq/
 .benchmarks/
 .snakemake/
-
+.DS_Store
 
 # Compiled source #
 ###################
