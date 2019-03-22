@@ -1,0 +1,5 @@
+sample	lane	fq1	fq2
+ISC-Pcgf1KO-rep1	lane1	/hpcnfs/techunits/genomics/PublicData/Pasini/spivetti/FASTQ/190225_A00302_0054_BHGHHKDMXX/Sample_S21435_LGR5-ISC-PCGF1KO-7d-BioRep1/S21435_LGR5-ISC-PCGF1KO-7d-BioRep1_S107_L002_R1_001.fastq.gz
+ISC-Pcgf1KO-rep2	lane1	/hpcnfs/techunits/genomics/PublicData/Pasini/spivetti/FASTQ/190225_A00302_0054_BHGHHKDMXX/Sample_S21436_LGR5-ISC-PCGF1KO-7d-BioRep2/S21436_LGR5-ISC-PCGF1KO-7d-BioRep2_S108_L002_R1_001.fastq.gz
+ISC-WT-rep1	lane1	/hpcnfs/techunits/genomics/PublicData/Pasini/dmangana/FASTQ/181026_SN880_0627_BCCBUHACXX/Sample_S20589_ISCLgr5WT_7dTAM_SMART_rep3/S20589_ISCLgr5WT_7dTAM_SMART_rep3_S28_L007_R1_001.fastq.gz
+ISC-WT-rep2	lane1	/hpcnfs/techunits/genomics/PublicData/Pasini/dmangana/FASTQ/181026_SN880_0627_BCCBUHACXX/Sample_S20588_ISCLgr5WT_7dTAM_SMART_rep2/S20588_ISCLgr5WT_7dTAM_SMART_rep2_S27_L007_R1_001.fastq.gz

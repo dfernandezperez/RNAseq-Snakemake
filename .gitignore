@@ -1,0 +1,20 @@
+# Don't track content of these folders
+00log/
+01alignments/
+02featureCounts/
+03deseq2/
+fastq/
+.benchmarks/
+.snakemake/
+
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+*.so
