@@ -8,7 +8,7 @@ rule deseq2:
     conda:
         "envs/deseq2.yaml"
     log:
-        "00logs/deseq2/init.log"
+        "00log/deseq2/init.log"
     script:
         "scripts/DESeq2.R"
 
@@ -23,6 +23,6 @@ rule get_contrasts:
     params:
         contrast = lambda w: config["diffexp"]["contrasts"][w.contrast]
     log:
-        "logs/deseq2/{contrast}.diffexp.log"
+        "00log/deseq2/{contrast}.diffexp.log"
     script:
         "scripts/get_DESeq2_contrasts.R"
