@@ -1,9 +1,10 @@
 # Don't track content of these folders
 00log/
-01alignments/
-02featureCounts/
-03deseq2/
-04results/
+01qc/
+02alignments/
+03featureCounts/
+04deseq2/
+05results/
 fastq/
 .benchmarks/
 .snakemake/

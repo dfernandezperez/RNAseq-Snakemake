@@ -9,11 +9,7 @@
         "error"       : ".clusterLogs/{rule}.{wildcards}.err",
         "MaxMem"      : 5
     },
-    "fastp_pe" :
-    {
-        "cpu" : 5
-    },
-    "fastp_se" :
+    "fastp" :
     {
         "cpu" : 5
     },
@@ -30,3 +26,4 @@
     {
         "cpu" : 10
     }
+}

@@ -5,6 +5,9 @@ samples: samples.tsv
 # sample).
 units: units.tsv
 
+# Parameters for submitting jobs to cluster via qsub
+cluster_json: cluster.json
+
 ref:
   # the STAR index
   index: "/hpcnfs/data/DP/Databases/STAR_mm10"
@@ -27,4 +30,4 @@ params:
   star: ""
   featureCounts: "-s 0 -t exon -g gene_name"
   fastp-se: "--stdin -t 1 -A -Q -L"
-  fastp-pe: "--stdin -t 1 -A -Q -L"
+  fastp-pe: "-t 1 -A -Q -L"

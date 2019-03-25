@@ -1,17 +1,17 @@
 import pandas as pd
 from snakemake.utils import validate, min_version
 
-shell.prefix('source activate DPbase; source activate /hpcnfs/data/DP/SnakemakePipelines/RNAseq-snakemake/.snakemake/conda/cea34b3f; ')
+singularity: "/hpcnfs/data/DP/Singularity/rnaseq-snakemake.simg"
 
 ##### set minimum snakemake version #####
-min_version("5.1.2")
+min_version("5.4.3")
 
 
 ##### load config, cluster config and sample sheets #####
 
 configfile: "config.yaml"
 # validate(config, schema="schemas/config.schema.yaml")
-CLUSTER = json.load(open(config['CLUSTER_JSON']))
+CLUSTER = json.load(open(config['cluster_json']))
 
 samples = pd.read_table(config["samples"]).set_index("sample", drop=False)
 # validate(samples, schema="schemas/samples.schema.yaml")
@@ -24,11 +24,14 @@ SAMPLES = set(units["sample"])
 
 rule all: 
 	input:
-		expand("04results/diffexp/{contrast}.diffexp.tsv", contrast = config["diffexp"]["contrasts"]),
-		"04results/pca.pdf"
+		expand("05results/diffexp/{contrast}.diffexp.tsv", contrast = config["diffexp"]["contrasts"]),
+		"05results/pca.pdf",
+		"01qc/multiqc_report.html"
 
 ##### load rules #####
 
+include: "common.smk"
 include: "trim.smk"
 include: "align.smk"
 include: "diffExp.smk"
+include: "qc.smk"

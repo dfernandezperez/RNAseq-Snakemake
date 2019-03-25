@@ -1,0 +1,186 @@
+/hpcnfs/home/ieo4462/.conda/envs/snakemake/lib/python3.6/site-packages/snakemake/workflow.py:18: FutureWarning: read_table is deprecated, use read_csv instead, passing sep='\t'.
+  
+/hpcnfs/home/ieo4462/.conda/envs/snakemake/lib/python3.6/site-packages/snakemake/workflow.py:21: FutureWarning: read_table is deprecated, use read_csv instead, passing sep='\t'.
+  from snakemake.exceptions import RuleException, CreateRuleException, \
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cluster nodes: 999
+Job counts:
+	count	jobs
+	1	all
+	4	cp_fastq_se
+	1	deseq2
+	4	fastp_se
+	4	fastqc
+	4	featureCounts
+	1	get_contrasts
+	1	multiqc
+	1	pca
+	1	rseqc_gtf2bed
+	4	rseqc_innerdis
+	4	rseqc_readdis
+	4	rseqc_readdup
+	4	rseqc_stat
+	4	star
+	42
+
+[Mon Mar 25 18:59:32 2019]
+Job 41: Copying fastq files /hpcnfs/techunits/genomics/PublicData/Pasini/spivetti/FASTQ/190225_A00302_0054_BHGHHKDMXX/Sample_S21436_LGR5-ISC-PCGF1KO-7d-BioRep2/S21436_LGR5-ISC-PCGF1KO-7d-BioRep2_S108_L002_R1_001.fastq.gz
+
+Submitted job 41 with external jobid '95957.hpcfe01'.
+
+[Mon Mar 25 18:59:32 2019]
+Job 40: Copying fastq files /hpcnfs/techunits/genomics/PublicData/Pasini/dmangana/FASTQ/181026_SN880_0627_BCCBUHACXX/Sample_S20589_ISCLgr5WT_7dTAM_SMART_rep3/S20589_ISCLgr5WT_7dTAM_SMART_rep3_S28_L007_R1_001.fastq.gz
+
+Submitted job 40 with external jobid '95958.hpcfe01'.
+
+[Mon Mar 25 18:59:32 2019]
+Job 38: Copying fastq files /hpcnfs/techunits/genomics/PublicData/Pasini/spivetti/FASTQ/190225_A00302_0054_BHGHHKDMXX/Sample_S21435_LGR5-ISC-PCGF1KO-7d-BioRep1/S21435_LGR5-ISC-PCGF1KO-7d-BioRep1_S107_L002_R1_001.fastq.gz
+
+Submitted job 38 with external jobid '95959.hpcfe01'.
+
+[Mon Mar 25 18:59:33 2019]
+rule rseqc_gtf2bed:
+    input: /hpcnfs/data/DP/Databases/STAR_mm10/gencode.vM19.primary_assembly.annotation.gtf
+    output: 01qc/rseqc/annotation.bed, 01qc/rseqc/annotation.db
+    log: 00log/rseqc_gtf2bed.log
+    jobid: 37
+
+Submitted job 37 with external jobid '95960.hpcfe01'.
+
+[Mon Mar 25 18:59:33 2019]
+Job 39: Copying fastq files /hpcnfs/techunits/genomics/PublicData/Pasini/dmangana/FASTQ/181026_SN880_0627_BCCBUHACXX/Sample_S20588_ISCLgr5WT_7dTAM_SMART_rep2/S20588_ISCLgr5WT_7dTAM_SMART_rep2_S27_L007_R1_001.fastq.gz
+
+Submitted job 39 with external jobid '95961.hpcfe01'.
+[Mon Mar 25 18:59:42 2019]
+Finished job 41.
+1 of 42 steps (2%) done
+
+[Mon Mar 25 18:59:42 2019]
+Job 36: Processing fastq files from fastq/ISC-Pcgf1KO-rep2-lane1.fastq.gz
+
+[Mon Mar 25 18:59:42 2019]
+Finished job 40.
+2 of 42 steps (5%) done
+Submitted job 36 with external jobid '95962.hpcfe01'.
+
+[Mon Mar 25 18:59:42 2019]
+Job 35: Processing fastq files from fastq/ISC-WT-rep1-lane1.fastq.gz
+
+Submitted job 35 with external jobid '95963.hpcfe01'.
+[Mon Mar 25 19:00:02 2019]
+Finished job 38.
+3 of 42 steps (7%) done
+
+[Mon Mar 25 19:00:03 2019]
+Job 33: Processing fastq files from fastq/ISC-Pcgf1KO-rep1-lane1.fastq.gz
+
+Submitted job 33 with external jobid '95964.hpcfe01'.
+[Mon Mar 25 19:03:03 2019]
+Finished job 39.
+4 of 42 steps (10%) done
+
+[Mon Mar 25 19:03:03 2019]
+Job 34: Processing fastq files from fastq/ISC-WT-rep2-lane1.fastq.gz
+
+Submitted job 34 with external jobid '95965.hpcfe01'.
+[Mon Mar 25 19:06:03 2019]
+Error in rule rseqc_gtf2bed:
+    jobid: 37
+    output: 01qc/rseqc/annotation.bed, 01qc/rseqc/annotation.db
+    log: 00log/rseqc_gtf2bed.log
+    cluster_jobid: 95960.hpcfe01
+
+/hpcnfs/home/ieo4462/.conda/envs/snakemake/lib/python3.6/site-packages/snakemake/workflow.py:18: FutureWarning: read_table is deprecated, use read_csv instead, passing sep='\t'.
+  
+/hpcnfs/home/ieo4462/.conda/envs/snakemake/lib/python3.6/site-packages/snakemake/workflow.py:21: FutureWarning: read_table is deprecated, use read_csv instead, passing sep='\t'.
+  from snakemake.exceptions import RuleException, CreateRuleException, \
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cluster nodes: 999
+Job counts:
+	count	jobs
+	1	all
+	4	cp_fastq_se
+	1	deseq2
+	4	fastp_se
+	4	fastqc
+	4	featureCounts
+	1	get_contrasts
+	1	multiqc
+	1	pca
+	1	rseqc_gtf2bed
+	4	rseqc_innerdis
+	4	rseqc_readdis
+	4	rseqc_readdup
+	4	rseqc_stat
+	4	star
+	42
+
+[Mon Mar 25 19:16:11 2019]
+Job 40: Copying fastq files /hpcnfs/techunits/genomics/PublicData/Pasini/spivetti/FASTQ/190225_A00302_0054_BHGHHKDMXX/Sample_S21435_LGR5-ISC-PCGF1KO-7d-BioRep1/S21435_LGR5-ISC-PCGF1KO-7d-BioRep1_S107_L002_R1_001.fastq.gz
+
+Submitted job 40 with external jobid '95966.hpcfe01'.
+
+[Mon Mar 25 19:16:11 2019]
+rule rseqc_gtf2bed:
+    input: /hpcnfs/data/DP/Databases/STAR_mm10/gencode.vM19.primary_assembly.annotation.gtf
+    output: 01qc/rseqc/annotation.bed, 01qc/rseqc/annotation.db
+    log: 00log/rseqc_gtf2bed.log
+    jobid: 37
+
+Submitted job 37 with external jobid '95967.hpcfe01'.
+
+[Mon Mar 25 19:16:11 2019]
+Job 41: Copying fastq files /hpcnfs/techunits/genomics/PublicData/Pasini/dmangana/FASTQ/181026_SN880_0627_BCCBUHACXX/Sample_S20588_ISCLgr5WT_7dTAM_SMART_rep2/S20588_ISCLgr5WT_7dTAM_SMART_rep2_S27_L007_R1_001.fastq.gz
+
+Submitted job 41 with external jobid '95968.hpcfe01'.
+
+[Mon Mar 25 19:16:11 2019]
+Job 39: Copying fastq files /hpcnfs/techunits/genomics/PublicData/Pasini/dmangana/FASTQ/181026_SN880_0627_BCCBUHACXX/Sample_S20589_ISCLgr5WT_7dTAM_SMART_rep3/S20589_ISCLgr5WT_7dTAM_SMART_rep3_S28_L007_R1_001.fastq.gz
+
+Submitted job 39 with external jobid '95969.hpcfe01'.
+
+[Mon Mar 25 19:16:11 2019]
+Job 38: Copying fastq files /hpcnfs/techunits/genomics/PublicData/Pasini/spivetti/FASTQ/190225_A00302_0054_BHGHHKDMXX/Sample_S21436_LGR5-ISC-PCGF1KO-7d-BioRep2/S21436_LGR5-ISC-PCGF1KO-7d-BioRep2_S108_L002_R1_001.fastq.gz
+
+Submitted job 38 with external jobid '95970.hpcfe01'.
+[Mon Mar 25 19:16:21 2019]
+Finished job 40.
+1 of 42 steps (2%) done
+
+[Mon Mar 25 19:16:21 2019]
+Job 35: Processing fastq files from fastq/ISC-Pcgf1KO-rep1-lane1.fastq.gz
+
+[Mon Mar 25 19:16:21 2019]
+Finished job 41.
+2 of 42 steps (5%) done
+Submitted job 35 with external jobid '95971.hpcfe01'.
+
+[Mon Mar 25 19:16:21 2019]
+Job 36: Processing fastq files from fastq/ISC-WT-rep2-lane1.fastq.gz
+
+Submitted job 36 with external jobid '95972.hpcfe01'.
+[Mon Mar 25 19:18:21 2019]
+Finished job 39.
+3 of 42 steps (7%) done
+
+[Mon Mar 25 19:18:21 2019]
+Job 34: Processing fastq files from fastq/ISC-WT-rep1-lane1.fastq.gz
+
+[Mon Mar 25 19:18:21 2019]
+Finished job 38.
+4 of 42 steps (10%) done
+Submitted job 34 with external jobid '95973.hpcfe01'.
+
+[Mon Mar 25 19:18:21 2019]
+Job 33: Processing fastq files from fastq/ISC-Pcgf1KO-rep2-lane1.fastq.gz
+
+Submitted job 33 with external jobid '95974.hpcfe01'.
+[Mon Mar 25 19:18:51 2019]
+Error in rule rseqc_gtf2bed:
+    jobid: 37
+    output: 01qc/rseqc/annotation.bed, 01qc/rseqc/annotation.db
+    log: 00log/rseqc_gtf2bed.log
+    cluster_jobid: 95967.hpcfe01
+

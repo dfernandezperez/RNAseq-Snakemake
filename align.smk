@@ -1,19 +1,9 @@
-def is_single_end(sample):
-    return pd.isnull(units.loc[(sample), "fq2"][0])
-
-def get_trimmed(wildcards):
-    if not is_single_end(**wildcards):
-        # paired-end sample
-        return expand("fastq/{sample}.{group}.fastq.gz", group=[1, 2], **wildcards)
-    # single end sample
-    return "fastq/{sample}.se.fastq.gz".format(**wildcards)
-
-
 rule star:
     input:
         get_trimmed
     output:
-        "02alignments/{sample}/{sample}.bam"
+        bam = "02alignments/{sample}/{sample}.bam",
+        log = "02alignments/{sample}/Log.final.out"
     log:
         "00log/alignments/{sample}.log"
     params:
@@ -45,16 +35,17 @@ rule star:
 
 rule featureCounts:
     input:
-         rules.star.output
+         rules.star.output.bam
     output:
-        featureCounts = "02featureCounts/{sample}/{sample}.featureCounts",
-        counts        = "02featureCounts/{sample}/{sample}.counts",
-        rpkm          = "02featureCounts/{sample}/{sample}.rpkm"
-        # tpm           = "02featureCounts/{sample}/{sample}.tpm"
+        featureCounts = "03featureCounts/{sample}/{sample}.featureCounts",
+        summary       = "03featureCounts/{sample}/{sample}.featureCounts.summary",
+        counts        = "03featureCounts/{sample}/{sample}.counts",
+        rpkm          = "03featureCounts/{sample}/{sample}.rpkm"
+        # tpm         = "03featureCounts/{sample}/{sample}.tpm"
     log:
         "00log/featureCounts/{sample}.log"
     params:
-        tmp      = "02featureCounts/{sample}/{sample}.seqDepth",
+        tmp      = "03featureCounts/{sample}/{sample}.seqDepth",
         gtf      = config["ref"]["annotation"],
         options  = config["params"]["featureCounts"],
         # Add -p option for pair-end data if it's the case

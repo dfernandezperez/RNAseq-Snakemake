@@ -1,8 +1,8 @@
 rule deseq2:
     input:
-        expand("02featureCounts/{sample}/{sample}.counts", sample = SAMPLES)
+        expand("03featureCounts/{sample}/{sample}.counts", sample = SAMPLES)
     output:
-        "03deseq2/all.rds"
+        "04deseq2/all.rds"
     params:
         samples=config["samples"]
     log:
@@ -14,8 +14,8 @@ rule get_contrasts:
     input:
         rules.deseq2.output
     output:
-        table="04results/diffexp/{contrast}.diffexp.tsv",
-        ma_plot="04results/diffexp/{contrast}.ma-plot.pdf",
+        table="05results/diffexp/{contrast}.diffexp.tsv",
+        ma_plot="05results/diffexp/{contrast}.ma-plot.pdf",
     params:
         contrast = lambda w: config["diffexp"]["contrasts"][w.contrast]
     log:
@@ -27,7 +27,7 @@ rule pca:
     input:
         rules.deseq2.output
     output:
-        "04results/pca.pdf"
+        "05results/pca.pdf"
     params:
         pca_labels=config["pca"]["labels"]
     log:

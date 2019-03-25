@@ -43,8 +43,8 @@ rule fastp_pe:
 		CLUSTER["fastp"]["cpu"]
 	params: 
 		fastp_params = config["params"]["fastp-pe"],
-		tmp_fw       = "{sample}.1.fastq.tmp.gz",
-		tmp_rv       = "{sample}.2.fastq.tmp.gz"
+		tmp_fw       = "fastq/{sample}.1.fastq.tmp.gz",
+		tmp_rv       = "fastq/{sample}.2.fastq.tmp.gz"
 	message: 
 		"Processing fastq files from {input}"
 	shadow: "minimal"
@@ -52,11 +52,11 @@ rule fastp_pe:
 		".benchmarks/{sample}.merge_fastqs.benchmark.txt"
 	run:
 		shell("""
-			cat {input.fw} > fastq/{params.tmp_fw}
-			cat {input.rv} > fastq/{params.tmp_rv}
-			/hpcnfs/data/DP/software/fastp -A -z 4 \
-			-i fastq/{params.tmp_fw} \
-			-I fastq/{params.tmp_rv} \
+			cat {input.fw} > {params.tmp_fw}
+			cat {input.rv} > {params.tmp_rv}
+			fastp -A -z 4 \
+			-i {params.tmp_fw} \
+			-I {params.tmp_rv} \
 			-o {output.fastq1} \
 			-O {output.fastq2} \
 			-w {threads} \
@@ -75,7 +75,6 @@ rule fastp_se:
 		CLUSTER["fastp"]["cpu"]
 	params: 
 		fastp_params = config["params"]["fastp-se"],
-		tmp_fw       = "{sample}.se.fastq.tmp.gz"
 	message: 
 		"Processing fastq files from {input}"
 	shadow: "minimal"
@@ -83,9 +82,8 @@ rule fastp_se:
 		".benchmarks/{sample}.merge_fastqs.benchmark.txt"
 	run:
 		shell("""
-			cat {input} > fastq/{params.tmp_fw}
-			/hpcnfs/data/DP/software/fastp -A -z 4 \
-			-i fastq/{params.tmp_fw} \
+			cat {input} | \
+			fastp -A -z 4 \
 			-o {output} \
 			-w {threads} {params.fastp_params} 2> {log}
 		    """)
