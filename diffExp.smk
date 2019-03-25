@@ -12,7 +12,7 @@ rule deseq2:
 
 rule get_contrasts:
     input:
-        "03deseq2/all.rds"
+        rules.deseq2.output
     output:
         table="04results/diffexp/{contrast}.diffexp.tsv",
         ma_plot="04results/diffexp/{contrast}.ma-plot.pdf",
@@ -25,7 +25,7 @@ rule get_contrasts:
 
 rule pca:
     input:
-        "03deseq2/all.rds"
+        rules.deseq2.output
     output:
         "04results/pca.pdf"
     params:

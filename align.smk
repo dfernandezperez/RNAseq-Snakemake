@@ -13,15 +13,16 @@ rule star:
     input:
         get_trimmed
     output:
-        "01alignments/{sample}/{sample}.bam"
+        "02alignments/{sample}/{sample}.bam"
     log:
         "00log/alignments/{sample}.log"
     params:
-        tmp_bam = "01alignments/{sample}/Aligned.sortedByCoord.out.bam",
-        out_dir = "01alignments/{sample}/",
+        tmp_bam = "02alignments/{sample}/Aligned.sortedByCoord.out.bam",
+        out_dir = "02alignments/{sample}/",
         # path to STAR reference genome index
         index   = config["ref"]["index"]
-    threads: 10
+    threads:
+        CLUSTER["star"]["cpu"]
     shadow: "minimal"
     run: 
         shell("""
@@ -44,7 +45,7 @@ rule star:
 
 rule featureCounts:
     input:
-         "01alignments/{sample}/{sample}.bam"
+         rules.star.output
     output:
         featureCounts = "02featureCounts/{sample}/{sample}.featureCounts",
         counts        = "02featureCounts/{sample}/{sample}.counts",
@@ -58,7 +59,8 @@ rule featureCounts:
         options  = config["params"]["featureCounts"],
         # Add -p option for pair-end data if it's the case
         pair_end = lambda w: "-p" if not is_single_end(w.sample) else str()
-    threads: 10
+    threads: 
+        CLUSTER["featureCounts"]["cpu"]
     run:
         shell("""
         featureCounts -T {threads} \

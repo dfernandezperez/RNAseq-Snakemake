@@ -1,5 +1,35 @@
-## RSEQC
+def is_single_end(sample):
+    return pd.isnull(units.loc[(sample), "fq2"][0])
 
+def get_trimmed(wildcards):
+    if not is_single_end(**wildcards):
+        # paired-end sample
+        return expand("fastq/{sample}.{group}.fastq.gz", group=[1, 2], **wildcards)
+    # single end sample
+    return "fastq/{sample}.se.fastq.gz".format(**wildcards)
+
+##------- FASTQC -------##
+rule fastqc:
+    input:  
+        get_trimmed
+    output: 
+        "01fqc/{sample}_fastqc.zip"
+    log:    
+        "00log/{sample}_fastqc"
+    params:
+        folder_name = "01fqc"
+    threads: 
+        CLUSTER["fastqc"]["cpu"]
+    message: 
+        "Running fastqc for {input}"
+    benchmark:
+        ".benchmarks/{sample}.fastqc.benchmark.txt"
+    shell:
+        """
+        fastqc -o {params.folder_name} -f fastq -t {threads} --noextract {input} 2> {log}
+        """
+
+##------- RSEQC -------##
 rule rseqc_gtf2bed:
     input:
         config["ref"]["annotation"]
@@ -15,7 +45,7 @@ rule rseqc_gtf2bed:
   
 rule rseqc_junction_annotation:
     input:
-        bam="01alignments/{sample}/{sample}.bam",
+        bam=rules.star.output,
         bed="qc/rseqc/annotation.bed"
     output:
         "qc/rseqc/{sample}.junctionanno.junction.bed"
@@ -32,7 +62,7 @@ rule rseqc_junction_annotation:
         
 rule rseqc_junction_saturation:
     input:
-        bam="01alignments/{sample}/{sample}.bam",
+        bam=rules.star.output,
         bed="qc/rseqc/annotation.bed"
     output:
         "qc/rseqc/{sample}.junctionsat.junctionSaturation_plot.pdf"
@@ -49,7 +79,7 @@ rule rseqc_junction_saturation:
 
 rule rseqc_stat:
     input:
-        "01alignments/{sample}/{sample}.bam",
+        rules.star.output,
     output:
         "qc/rseqc/{sample}.stats.txt"
     priority: 1
@@ -61,7 +91,7 @@ rule rseqc_stat:
         
 rule rseqc_infer:
     input:
-        bam="01alignments/{sample}/{sample}.bam",
+        bam=rules.star.output,
         bed="qc/rseqc/annotation.bed"
     output:
         "qc/rseqc/{sample}.infer_experiment.txt"
@@ -74,7 +104,7 @@ rule rseqc_infer:
         
 rule rseqc_innerdis:
     input:
-        bam="01alignments/{sample}/{sample}.bam",
+        bam=rules.star.output,
         bed="qc/rseqc/annotation.bed"
     output:
         "qc/rseqc/{sample}.inner_distance_freq.inner_distance.txt"
@@ -89,7 +119,7 @@ rule rseqc_innerdis:
 
 rule rseqc_readdis:
     input:
-        bam="01alignments/{sample}/{sample}.bam",
+        bam=rules.star.output,
         bed="qc/rseqc/annotation.bed"
     output:
         "qc/rseqc/{sample}.readdistribution.txt"
@@ -102,7 +132,7 @@ rule rseqc_readdis:
 
 rule rseqc_readdup:
     input:
-        "01alignments/{sample}/{sample}.bam"
+        rules.star.output
     output:
         "qc/rseqc/{sample}.readdup.DupRate_plot.pdf"
     priority: 1
@@ -116,7 +146,7 @@ rule rseqc_readdup:
         
 rule rseqc_readgc:
     input:
-        "01alignments/{sample}/{sample}.bam"
+        rules.star.output
     output:
         "qc/rseqc/{sample}.readgc.GC_plot.pdf"
     priority: 1
@@ -128,9 +158,10 @@ rule rseqc_readgc:
         "read_GC.py -i {input} -o {params.prefix} > {log} 2>&1"
         
 
+##------- MULTIQC -------##
 rule multiqc:
     input:
-        expand("01alignments/{sample}/{sample}.bam", sample = SAMPLES),
+        expand("02alignments/{sample}/{sample}.bam", sample = SAMPLES),
         expand("qc/rseqc/{sample}.junctionanno.junction.bed", sample = SAMPLES),
         expand("qc/rseqc/{sample}.junctionsat.junctionSaturation_plot.pdf", sample = SAMPLES),
         expand("qc/rseqc/{sample}.infer_experiment.txt", sample = SAMPLES),
@@ -146,7 +177,8 @@ rule multiqc:
         "00log/multiqc.log"
     params:
         log_name = "multiQC_log"
+        folder_name = "10multiQC"
     shell:
         """
-        multiqc {input} -o 10multiQC -f -v -n {params.log_name} 2> {log}
+        multiqc {input} -o {params.folder_name} -f -v -n {params.log_name} 2> {log}
         """

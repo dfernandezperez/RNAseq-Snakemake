@@ -1,15 +1,17 @@
 import pandas as pd
 from snakemake.utils import validate, min_version
+
 shell.prefix('source activate DPbase; source activate /hpcnfs/data/DP/SnakemakePipelines/RNAseq-snakemake/.snakemake/conda/cea34b3f; ')
 
 ##### set minimum snakemake version #####
 min_version("5.1.2")
 
 
-##### load config and sample sheets #####
+##### load config, cluster config and sample sheets #####
 
 configfile: "config.yaml"
 # validate(config, schema="schemas/config.schema.yaml")
+CLUSTER = json.load(open(config['CLUSTER_JSON']))
 
 samples = pd.read_table(config["samples"]).set_index("sample", drop=False)
 # validate(samples, schema="schemas/samples.schema.yaml")

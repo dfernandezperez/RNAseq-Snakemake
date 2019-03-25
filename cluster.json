@@ -1,0 +1,32 @@
+{
+    "__default__" :
+    {
+        "cpu"         : 1,
+        "email"       : "ieo4462@ieo.it",
+        "EmailNotice" : "a",
+        "jname"       : "{rule}.{wildcards}",
+        "output"      : ".clusterLogs/{rule}.{wildcards}.out",
+        "error"       : ".clusterLogs/{rule}.{wildcards}.err",
+        "MaxMem"      : 5
+    },
+    "fastp_pe" :
+    {
+        "cpu" : 5
+    },
+    "fastp_se" :
+    {
+        "cpu" : 5
+    },
+    "fastqc":
+    {
+        "cpu" : 5
+    },
+    "star":
+    {
+        "cpu" : 10,
+        "MaxMem" : 40
+    },
+    "featureCounts":
+    {
+        "cpu" : 10
+    }
