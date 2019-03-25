@@ -8,6 +8,7 @@
 fastq/
 .benchmarks/
 .snakemake/
+.clusterLogs/
 .DS_Store
 
 # Compiled source #
