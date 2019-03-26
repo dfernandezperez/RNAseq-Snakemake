@@ -30,4 +30,5 @@ dds <- DESeqDataSetFromMatrix(countData = counts_ordered,
                               design = ~ condition)
 dds <- DESeq(dds)
 
-saveRDS(dds, file=snakemake@output[[1]])
+write.table(counts(dds, normalized = T), snakemake@output[["norm_counts"]], sep = "\t", quote = F)
+saveRDS(dds, file=snakemake@output[["rds"]])

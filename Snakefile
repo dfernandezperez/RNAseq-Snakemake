@@ -24,9 +24,13 @@ SAMPLES = set(units["sample"])
 
 rule all: 
 	input:
-		expand("05results/diffexp/{contrast}.diffexp.tsv", contrast = config["diffexp"]["contrasts"]),
-		"05results/pca.pdf",
+		expand("04deseq2/{contrast}/{contrast}_diffexp.tsv", contrast = config["diffexp"]["contrasts"]),
+		"04deseq2/pca.pdf",
 		"01qc/multiqc_report.html"
+
+# expand("04deseq2/{contrast}/{contrast}.diffexp.{log2fc}.{pvalue}.tsv", contrast = config["diffexp"]["contrasts"], 
+# 																pvalue = config["diffexp"]["pvalue"], 
+# 																log2fc = config["diffexp"]["log2fc"])
 
 ##### load rules #####
 

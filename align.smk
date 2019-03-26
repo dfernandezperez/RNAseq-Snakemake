@@ -9,27 +9,25 @@ rule star:
     params:
         tmp_bam = "02alignments/{sample}/Aligned.sortedByCoord.out.bam",
         out_dir = "02alignments/{sample}/",
+        star_params = config["params"]["star"],
         # path to STAR reference genome index
         index   = config["ref"]["index"]
     threads:
         CLUSTER["star"]["cpu"]
-    shadow: "minimal"
+    shadow: 
+        "minimal"
     shell: 
         """
         STAR --genomeDir {params.index} \
         --runThreadN {threads} \
         --readFilesIn {input} \
         --outFileNamePrefix {params.out_dir} \
-        --outSAMtype BAM SortedByCoordinate \
-        --outSAMattributes Standard \
-        --outFilterMultimapNmax 1 \
-        --bamRemoveDuplicatesType UniqueIdentical \
-        --readFilesCommand zcat \
-        --outStd Log > {log} 2>&1
+        --outStd Log \
+        {params.star_params} > {log} 2>&1
 
         # Remove duplicates marked by STAR with the flag 0x400
-        samtools view -@ {threads} -b -F 0x400 {params.tmp_bam} > {output}
-        samtools index {output}
+        samtools view -@ {threads} -b -F 0x400 {params.tmp_bam} > {output.bam}
+        samtools index {output.bam}
         """
 
 

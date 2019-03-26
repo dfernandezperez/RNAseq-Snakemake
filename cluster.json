@@ -11,19 +11,19 @@
     },
     "fastp" :
     {
-        "cpu" : 5
+        "cpu" : 2
     },
     "fastqc":
     {
-        "cpu" : 5
+        "cpu" : 2
     },
     "star":
     {
-        "cpu" : 10,
+        "cpu" : 2,
         "MaxMem" : 40
     },
     "featureCounts":
     {
-        "cpu" : 10
+        "cpu" : 2
     }
 }

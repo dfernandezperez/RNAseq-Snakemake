@@ -46,7 +46,8 @@ rule fastp_pe:
 		tmp_rv       = "fastq/{sample}.2.fastq.tmp.gz"
 	message: 
 		"Processing fastq files from {input}"
-	shadow: "minimal"
+	shadow: 
+		"minimal"
 	benchmark:
 		".benchmarks/{sample}.merge_fastqs.benchmark.txt"
 	shell:
@@ -75,7 +76,8 @@ rule fastp_se:
 		fastp_params = config["params"]["fastp-se"],
 	message: 
 		"Processing fastq files from {input}"
-	shadow: "minimal"
+	shadow: 
+		"minimal"
 	benchmark:
 		".benchmarks/{sample}.merge_fastqs.benchmark.txt"
 	shell:

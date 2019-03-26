@@ -10,9 +10,9 @@ cluster_json: cluster.json
 
 ref:
   # the STAR index
-  index: "/hpcnfs/data/DP/Databases/STAR_mm10"
+  index: "/hpcnfs/data/DP/Databases/STAR_mm10_v2_7"
   # gtf file with transcripts
-  annotation: "/hpcnfs/data/DP/Databases/STAR_mm10/gencode.vM19.primary_assembly.annotation.gtf"
+  annotation: "/hpcnfs/data/DP/Databases/STAR_mm10_v2_7/gencode.vM19.primary_assembly.annotation.gtf"
 
 pca:
   labels:
@@ -20,6 +20,8 @@ pca:
     - condition
 
 diffexp:
+  pvalue: 0.05
+  log2fc: 2
   # contrasts for the deseq2 results method
   contrasts:
     P1KO-vs-WT:
@@ -27,7 +29,10 @@ diffexp:
       - WT
 
 params:
-  star: ""
+  star: "--outSAMtype BAM SortedByCoordinate \
+        --outSAMattributes Standard \
+        --outFilterMultimapNmax 1 \
+        --bamRemoveDuplicatesType UniqueIdentical"
   featureCounts: "-s 0 -t exon -g gene_name"
   fastp-se: "--stdin -t 1 -A -Q -L"
   fastp-pe: "-t 1 -A -Q -L"
