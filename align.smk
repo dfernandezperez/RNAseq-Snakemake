@@ -14,8 +14,8 @@ rule star:
     threads:
         CLUSTER["star"]["cpu"]
     shadow: "minimal"
-    run: 
-        shell("""
+    shell: 
+        """
         STAR --genomeDir {params.index} \
         --runThreadN {threads} \
         --readFilesIn {input} \
@@ -30,7 +30,7 @@ rule star:
         # Remove duplicates marked by STAR with the flag 0x400
         samtools view -@ {threads} -b -F 0x400 {params.tmp_bam} > {output}
         samtools index {output}
-        """)
+        """
 
 
 rule featureCounts:
@@ -52,8 +52,8 @@ rule featureCounts:
         pair_end = lambda w: "-p" if not is_single_end(w.sample) else str()
     threads: 
         CLUSTER["featureCounts"]["cpu"]
-    run:
-        shell("""
+    shell:
+        """
         featureCounts -T {threads} \
         -a {params.gtf} \
         -o {output.featureCounts} \
@@ -63,4 +63,4 @@ rule featureCounts:
         cut -f 1,7 {output.featureCounts} | tail -n +2 > {output.counts}
         seqdepth=$(awk '{{sum+=$2}}END{{print sum}}' {output.counts})
         awk -v s=${{seqdepth}} 'BEGIN{{OFS="\t"}}NR>2{{print $1,(($7)*1000000*1000)/($6*s)}}' {output.featureCounts} > {output.rpkm}
-        """)
+        """

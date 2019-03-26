@@ -9,12 +9,11 @@ rule cp_fastq_pe:
         fastq2=temp("fastq/{sample}-{lane}.2.fastq.gz")
     message: 
         "Copying fastq files {input}"
-    run:
-        file1,file2 = input
-        shell("""
-            ln -s {file1} {output.fastq1}
-            ln -s {file2} {output.fastq2}
-            """)
+    shell:
+        """
+        ln -s {input[0]} {output.fastq1}
+        ln -s {input[1]} {output.fastq2}
+        """
 
 
 rule cp_fastq_se:
@@ -24,10 +23,10 @@ rule cp_fastq_se:
         temp("fastq/{sample}-{lane}.fastq.gz"),
     message: 
         "Copying fastq files {input}"
-    run:
-        shell("""
-            ln -s {input} {output}
-            """)
+    shell:
+        """
+        ln -s {input} {output}
+        """
 
 
 rule fastp_pe:
@@ -35,8 +34,8 @@ rule fastp_pe:
 		fw = lambda w: expand("fastq/{lane.sample}-{lane.lane}.1.fastq.gz", lane=units.loc[w.sample].itertuples()),
 		rv = lambda w: expand("fastq/{lane.sample}-{lane.lane}.2.fastq.gz", lane=units.loc[w.sample].itertuples())
 	output: 
-		fastq1 = "fastq/{sample}.1.fastq.gz",
-		fastq2 = "fastq/{sample}.2.fastq.gz"
+		fastq1 = "fastq/{sample}.1.fastq",
+		fastq2 = "fastq/{sample}.2.fastq"
 	log: 
 		"00log/fastp/{sample}.log"
 	threads: 
@@ -50,25 +49,24 @@ rule fastp_pe:
 	shadow: "minimal"
 	benchmark:
 		".benchmarks/{sample}.merge_fastqs.benchmark.txt"
-	run:
-		shell("""
-			cat {input.fw} > {params.tmp_fw}
-			cat {input.rv} > {params.tmp_rv}
-			fastp -A -z 4 \
-			-i {params.tmp_fw} \
-			-I {params.tmp_rv} \
-			-o {output.fastq1} \
-			-O {output.fastq2} \
-			-w {threads} \
-			{params.fastp_params} 2> {log}
-		    """)
+	shell:
+		"""
+		cat {input.fw} > {params.tmp_fw}
+		cat {input.rv} > {params.tmp_rv}
+		fastp -i {params.tmp_fw} \
+		-I {params.tmp_rv} \
+		-o {output.fastq1} \
+		-O {output.fastq2} \
+		-w {threads} \
+		{params.fastp_params} 2> {log}
+		"""
 
 
 rule fastp_se:
 	input:
 		lambda w: expand("fastq/{lane.sample}-{lane.lane}.fastq.gz", lane=units.loc[w.sample].itertuples()),
 	output: 
-		"fastq/{sample}.se.fastq.gz"
+		"fastq/{sample}.se.fastq"
 	log: 
 		"00log/fastp/{sample}.log"
 	threads: 
@@ -80,10 +78,9 @@ rule fastp_se:
 	shadow: "minimal"
 	benchmark:
 		".benchmarks/{sample}.merge_fastqs.benchmark.txt"
-	run:
-		shell("""
-			cat {input} | \
-			fastp -A -z 4 \
-			-o {output} \
-			-w {threads} {params.fastp_params} 2> {log}
-		    """)
+	shell:
+		"""
+		zcat {input} | \
+		fastp -o {output} \
+		-w {threads} {params.fastp_params} 2> {log}
+		"""

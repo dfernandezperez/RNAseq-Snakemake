@@ -25,8 +25,7 @@ rule rseqc_gtf2bed:
     input:
         config["ref"]["annotation"]
     output:
-        bed = "01qc/rseqc/annotation.bed",
-        db  = temp("01qc/rseqc/annotation.db")
+        bed = "01qc/rseqc/annotation.bed"
     log:
         "00log/rseqc_gtf2bed.log"
     shell:

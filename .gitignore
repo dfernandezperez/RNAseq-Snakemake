@@ -6,10 +6,12 @@
 04deseq2/
 05results/
 fastq/
+
 .benchmarks/
 .snakemake/
 .clusterLogs/
 .DS_Store
+snakemake.log
 
 # Compiled source #
 ###################
@@ -18,6 +20,4 @@ fastq/
 *.dll
 *.exe
 *.o
-*.so
-
 *.so
