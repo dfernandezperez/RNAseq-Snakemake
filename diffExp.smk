@@ -17,6 +17,8 @@ rule get_contrasts:
     output:
         table   = "04deseq2/{contrast}/{contrast}_diffexp.tsv",
         ma_plot = "04deseq2/{contrast}/{contrast}_ma-plot.pdf",
+        pval_hist = "04deseq2/{contrast}/{contrast}_pval-hist.pdf",
+        deseqRes = "04deseq2/{contrast}/{contrast}_deseqRes.rds",
     params:
         contrast = lambda w: config["diffexp"]["contrasts"][w.contrast]
     log:
@@ -36,13 +38,33 @@ rule pca:
     script:
         "scripts/plot-PCA.R"
 
-# rule filter_deg:
+
+rule filter_deg:
+    input:
+        rules.get_contrasts.output.table
+    output:
+        "04deseq2/{contrast}/{log2fc}_{pvalue}/{contrast}_diffexp_{log2fc}_{pvalue}.tsv"
+    params:
+        pval   = config["diffexp"]["pvalue"],
+        log2fc = config["diffexp"]["log2fc"],
+        contrast = lambda w: config["diffexp"]["contrasts"][w.contrast]
+    log:
+        "00log/deseq2/{contrast}.{log2fc}.{pvalue}.filter_deg.log"
+    script:
+        "scripts/filter_deg.R"
+
+
+# rule deg_analysis:
 #     input:
-#         rules.get_contrasts.output.table
+#         rules.filter_deg.output
 #     output:
-#         "04deseq2/{contrast}/{log2fc}_{pvalue}/{contrast}_diffexp_{log2fc}_{pvalue}.tsv"
+#         "04deseq2/{contrast}/{log2fc}_{pvalue}/{contrast}_volcano_{log2fc}_{pvalue}.pdf",
+#         "04deseq2/{contrast}/{log2fc}_{pvalue}/{contrast}_enrichments_{log2fc}_{pvalue}.xlsx",
 #     params:
-#         pval   = config["diffexp"]["pvalue"],
-#         log2fc = config["diffexp"]["log2fc"]
+#         pval     = config["diffexp"]["pvalue"],
+#         log2fc   = config["diffexp"]["log2fc"],
+#         contrast = lambda w: config["diffexp"]["contrasts"][w.contrast],
 #     log:
-#         "00log/deseq2/{contrast}.{log2fc}.{pvalue}.filter_deg.log"
+#         "00log/deseq2/{contrast}.{log2fc}.{pvalue}.deg_analysis.log"
+#     script:
+#         "scripts/Volcano_GOenrichment.R"   

@@ -7,7 +7,7 @@
         "jname"       : "{rule}.{wildcards}",
         "output"      : ".clusterLogs/{rule}.{wildcards}.out",
         "error"       : ".clusterLogs/{rule}.{wildcards}.err",
-        "MaxMem"      : 5
+        "MaxMem"      : 8
     },
     "fastp" :
     {
@@ -25,5 +25,9 @@
     "featureCounts":
     {
         "cpu" : 2
+    },
+    "deseq2":
+    {
+        "MaxMem" : 16
     }
 }

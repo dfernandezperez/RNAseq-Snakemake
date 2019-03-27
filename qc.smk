@@ -81,7 +81,7 @@ rule rseqc_readdis:
         bam = rules.star.output.bam,
         bed = "01qc/rseqc/annotation.bed"
     output:
-        "01qc/rseqc/{sample}.readdistribution.txt"
+        "01qc/rseqc/{sample}.read_distribution.txt"
     priority: 1
     log:
         "00log/rseqc/rseqc_readdis/{sample}.log"
@@ -89,18 +89,18 @@ rule rseqc_readdis:
         "read_distribution.py -r {input.bed} -i {input.bam} > {output} 2> {log}"
 
 
-rule rseqc_readdup:
-    input:
-        rules.star.output.bam
-    output:
-        "01qc/rseqc/{sample}.readdup.DupRate_plot.pdf"
-    priority: 1
-    log:
-        "00log/rseqc/rseqc_readdup/{sample}.log"
-    params:
-        prefix="01qc/rseqc/{sample}.readdup"
-    shell:
-        "read_duplication.py -i {input} -o {params.prefix} > {log} 2>&1"
+# rule rseqc_readdup:
+#     input:
+#         rules.star.output.bam
+#     output:
+#         "01qc/rseqc/{sample}.readdup.DupRate_plot.pdf"
+#     priority: 1
+#     log:
+#         "00log/rseqc/rseqc_readdup/{sample}.log"
+#     params:
+#         prefix="01qc/rseqc/{sample}.readdup"
+#     shell:
+#         "read_duplication.py -i {input} -o {params.prefix} > {log} 2>&1"
 
         
 # rule rseqc_readgc:
@@ -169,17 +169,16 @@ rule multiqc:
         expand("02alignments/{sample}/Log.final.out", sample = SAMPLES),
         expand("03featureCounts/{sample}/{sample}.featureCounts.summary", sample = SAMPLES),
         expand("01qc/rseqc/{sample}.stats.txt", sample = SAMPLES),
-        expand("01qc/rseqc/{sample}.inner_distance_freq.inner_distance.txt", sample = SAMPLES),
-        expand("01qc/rseqc/{sample}.readdistribution.txt", sample = SAMPLES),
-        expand("01qc/rseqc/{sample}.readdup.DupRate_plot.pdf", sample = SAMPLES)
+        expand("01qc/rseqc/{sample}.inner_distance_freq.inner_distance_plot.r", sample = SAMPLES),
+        expand("01qc/rseqc/{sample}.read_distribution.txt", sample = SAMPLES),
+        expand("01qc/rseqc/{sample}.readdup.DupRate_plot.r", sample = SAMPLES)
     output:
         "01qc/multiqc_report.html"
     log:
         "00log/multiqc.log"
     params:
-        log_name = "multiQC_log",
         folder_name = "01qc"
     shell:
         """
-        multiqc {input} -o {params.folder_name} -f -v -n {params.log_name} 2> {log}
+        multiqc {input} -o {params.folder_name} -f -v 2> {log}
         """

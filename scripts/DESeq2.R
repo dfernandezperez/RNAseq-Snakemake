@@ -5,6 +5,7 @@ sink(log, type="message")
 
 library(DESeq2)
 library(dplyr)
+library(tibble)
 
 #------------------------- Preapre count table ------------------------------
 read_files <- lapply(snakemake@input, function(x) read.delim(x, header = TRUE))
@@ -15,7 +16,7 @@ sample_names <- unlist(snakemake@input) %>%
 
 counts <- plyr::join_all(read_files, type='inner', by = "Geneid") %>% 
   setNames(c("GeneSymbol", sample_names)) %>%
-  tibble::column_to_rownames("GeneSymbol")
+  column_to_rownames("GeneSymbol")
 
 
 #------------------------- DESeq2 workflow ------------------------------
@@ -30,5 +31,8 @@ dds <- DESeqDataSetFromMatrix(countData = counts_ordered,
                               design = ~ condition)
 dds <- DESeq(dds)
 
-write.table(counts(dds, normalized = T), snakemake@output[["norm_counts"]], sep = "\t", quote = F)
+norm_counts <- counts(dds, normalized = T) %>% data.frame %>% round(3) %>% rownames_to_column(var = "Geneid")
+
+write.table(norm_counts, snakemake@output[["norm_counts"]], sep = "\t", quote = F)
+
 saveRDS(dds, file=snakemake@output[["rds"]])
