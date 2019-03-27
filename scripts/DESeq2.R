@@ -33,6 +33,6 @@ dds <- DESeq(dds)
 
 norm_counts <- counts(dds, normalized = T) %>% data.frame %>% round(3) %>% rownames_to_column(var = "Geneid")
 
-write.table(norm_counts, snakemake@output[["norm_counts"]], sep = "\t", quote = F)
+write.table(norm_counts, snakemake@output[["norm_counts"]], sep = "\t", quote = F, row.names = FALSE)
 
 saveRDS(dds, file=snakemake@output[["rds"]])

@@ -26,7 +26,7 @@ plotMA(res, ylim=c(-4,4))
 dev.off()
 
 pdf(snakemake@output[["pval_hist"]])
-qplot(res.filt$pvalue, xlab = "p-value", ylab = "count", main = paste(snakemake@params[["contrast"]]))
+qplot(res.filt$pvalue, xlab = "p-value", ylab = "count")
 dev.off()
 
 write.table( round_df(res.filt,3), file=snakemake@output[["table"]], sep = "\t", quote = F, row.names = F )

@@ -41,9 +41,9 @@ rule pca:
 
 rule filter_deg:
     input:
-        rules.get_contrasts.output.table
+        rules.get_contrasts.output.deseqRes
     output:
-        "04deseq2/{contrast}/{log2fc}_{pvalue}/{contrast}_diffexp_{log2fc}_{pvalue}.tsv"
+        "04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}/{contrast}_diffexp_{log2fc}_{pvalue}.tsv"
     params:
         pval   = config["diffexp"]["pvalue"],
         log2fc = config["diffexp"]["log2fc"],
@@ -54,17 +54,17 @@ rule filter_deg:
         "scripts/filter_deg.R"
 
 
-# rule deg_analysis:
-#     input:
-#         rules.filter_deg.output
-#     output:
-#         "04deseq2/{contrast}/{log2fc}_{pvalue}/{contrast}_volcano_{log2fc}_{pvalue}.pdf",
-#         "04deseq2/{contrast}/{log2fc}_{pvalue}/{contrast}_enrichments_{log2fc}_{pvalue}.xlsx",
-#     params:
-#         pval     = config["diffexp"]["pvalue"],
-#         log2fc   = config["diffexp"]["log2fc"],
-#         contrast = lambda w: config["diffexp"]["contrasts"][w.contrast],
-#     log:
-#         "00log/deseq2/{contrast}.{log2fc}.{pvalue}.deg_analysis.log"
-#     script:
-#         "scripts/Volcano_GOenrichment.R"   
+rule deg_analysis:
+    input:
+        rules.filter_deg.output
+    output:
+        "04deseq2/{contrast}/{log2fc}_{pvalue}/{contrast}_volcano_{log2fc}_{pvalue}.pdf",
+        "04deseq2/{contrast}/{log2fc}_{pvalue}/{contrast}_enrichments_{log2fc}_{pvalue}.xlsx",
+    params:
+        pval     = config["diffexp"]["pvalue"],
+        log2fc   = config["diffexp"]["log2fc"],
+        contrast = lambda w: config["diffexp"]["contrasts"][w.contrast],
+    log:
+        "00log/deseq2/{contrast}.{log2fc}.{pvalue}.deg_analysis.log"
+    script:
+        "scripts/Volcano_GOenrichment.R"   
