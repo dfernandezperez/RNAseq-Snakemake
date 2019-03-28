@@ -1,6 +1,6 @@
-log <- file(snakemake@log[[1]], open="wt")
+log <- file(snakemake@log[[1]], open = "wt")
 sink(log)
-sink(log, type="message")
+sink(log, type = "message")
 
 
 library(DESeq2)
@@ -27,11 +27,14 @@ counts_ordered <- counts[as.character(colData$sample)]
 stopifnot(identical(colnames(counts_ordered), as.character(colData$sample)))
 
 dds <- DESeqDataSetFromMatrix(countData = counts_ordered,
-                              colData = colData,
-                              design = ~ condition)
+                              colData   = colData,
+                              design    = ~ condition)
 dds <- DESeq(dds)
 
-norm_counts <- counts(dds, normalized = T) %>% data.frame %>% round(3) %>% rownames_to_column(var = "Geneid")
+norm_counts <- counts(dds, normalized = T) %>% 
+				data.frame %>% 
+				round(3) %>% 
+				rownames_to_column(var = "Geneid")
 
 write.table(norm_counts, snakemake@output[["norm_counts"]], sep = "\t", quote = F, row.names = FALSE)
 

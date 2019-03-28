@@ -1,6 +1,6 @@
-log <- file(snakemake@log[[1]], open="wt")
+log <- file(snakemake@log[[1]], open = "wt")
 sink(log)
-sink(log, type="message")
+sink(log, type = "message")
 
 library("DESeq2")
 library("dplyr")
@@ -10,20 +10,19 @@ source("scripts/custom_functions.R")
 dds <- readRDS(snakemake@input[[1]])
 
 contrast <- c("condition", snakemake@params[["contrast"]])
-res <- results(dds, contrast=contrast)
+res <- results(dds, contrast = contrast)
 # shrink fold changes for lowly expressed genes
-res <- lfcShrink(dds, contrast=contrast, res=res)
+res <- lfcShrink(dds, contrast = contrast, res = res)
 # sort by p-value
 res <- res[order(res$padj),]
 # TODO explore IHW usage
-saveRDS(res, file=snakemake@output[["deseqRes"]])
 
 # Geneid to column, round to 3 deciamls all columns except pvalues
-pval <- res$pvalue
-padjust <- res$padj
-res.filt <- as.data.frame(res) %>% rownames_to_column(var = "Geneid") %>% round_df(2)
+pval            <- res$pvalue
+padjust         <- res$padj
+res.filt        <- as.data.frame(res) %>% rownames_to_column(var = "Geneid") %>% round_df(2)
 res.filt$pvalue <- pval
-res.filt$padj <- padjust
+res.filt$padj   <- padjust
 
 # store results
 pdf(snakemake@output[["ma_plot"]])
@@ -34,4 +33,4 @@ pdf(snakemake@output[["pval_hist"]])
 qplot(res.filt$pvalue, xlab = "p-value", ylab = "count")
 dev.off()
 
-write.table( res.filt, file=snakemake@output[["table"]], sep = "\t", quote = F, row.names = F ) 
+write.table( res.filt, file = snakemake@output[["table"]], sep = "\t", quote = F, row.names = F ) 

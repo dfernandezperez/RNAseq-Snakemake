@@ -15,12 +15,11 @@ rule get_contrasts:
     input:
         rules.deseq2.output
     output:
-        table   = "04deseq2/{contrast}/{contrast}_diffexp.tsv",
-        ma_plot = "04deseq2/{contrast}/{contrast}_ma-plot.pdf",
+        table     = "04deseq2/{contrast}/{contrast}_diffexp.tsv",
+        ma_plot   = "04deseq2/{contrast}/{contrast}_ma-plot.pdf",
         pval_hist = "04deseq2/{contrast}/{contrast}_pval-hist.pdf",
-        deseqRes = "04deseq2/{contrast}/{contrast}_deseqRes.rds",
     params:
-        contrast = lambda w: config["diffexp"]["contrasts"][w.contrast]
+        contrast = lambda w: config["diffexp"]["contrasts"][w.contrast],
     log:
         "00log/deseq2/{contrast}.diffexp.log"
     script:
@@ -45,9 +44,8 @@ rule filter_deg:
     output:
         "04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}/{contrast}_diffexp_log2fc{log2fc}_pval{pvalue}.tsv"
     params:
-        pval   = config["diffexp"]["pvalue"],
-        log2fc = config["diffexp"]["log2fc"],
-        contrast = lambda w: config["diffexp"]["contrasts"][w.contrast]
+        pval     = config["diffexp"]["pvalue"],
+        log2fc   = config["diffexp"]["log2fc"],
     log:
         "00log/deseq2/{contrast}.{log2fc}.{pvalue}.filter_deg.log"
     script:
@@ -63,7 +61,7 @@ rule deg_analysis:
     params:
         pval     = config["diffexp"]["pvalue"],
         log2fc   = config["diffexp"]["log2fc"],
-        contrast = lambda w: config["diffexp"]["contrasts"][w.contrast],
+        contrast = lambda w: w.contrast,
         genome   = config["ref"]["genome"],
     log:
         "00log/deseq2/{contrast}.log2fc{log2fc}_pval{pvalue}.deg_analysis.log"
