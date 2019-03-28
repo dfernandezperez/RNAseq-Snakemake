@@ -27,14 +27,18 @@ rule all:
 		expand("04deseq2/{contrast}/{contrast}_diffexp.tsv", contrast = config["diffexp"]["contrasts"]),
 		"04deseq2/pca.pdf",
 		"01qc/multiqc_report.html",
-		expand("04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}/{contrast}_diffexp_{log2fc}_{pvalue}.tsv", contrast = config["diffexp"]["contrasts"], 
+		expand("04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}/{contrast}_diffexp_log2fc{log2fc}_pval{pvalue}.tsv", contrast = config["diffexp"]["contrasts"], 
+																		pvalue = config["diffexp"]["pvalue"], 
+																		log2fc = config["diffexp"]["log2fc"]),
+		expand("04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}/{contrast}_enrichments_log2fc{log2fc}_pval{pvalue}.xlsx", contrast = config["diffexp"]["contrasts"], 
 																		pvalue = config["diffexp"]["pvalue"], 
 																		log2fc = config["diffexp"]["log2fc"])
+		
 
 ##### load rules #####
 
-include: "common.smk"
-include: "trim.smk"
-include: "align.smk"
-include: "diffExp.smk"
-include: "qc.smk"
+include: "rules/common.smk"
+include: "rules/trim.smk"
+include: "rules/align.smk"
+include: "rules/diffExp.smk"
+include: "rules/qc.smk"

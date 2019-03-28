@@ -4,7 +4,7 @@ sink(log, type="message")
 
 source("scripts/custom_functions.R")
 
-contrast<- readRDS(snakemake@input[[1]])
+contrast<- read.delim(snakemake@input[[1]])
 
 contrast.filt <- Annot_DE(contrast, log2FC = snakemake@params[["log2fc"]], padjust = snakemake@params[["pval"]])
 

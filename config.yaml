@@ -1,6 +1,7 @@
-# path or URL to sample sheet (TSV format, columns: sample, condition, ...)
+# path to sample sheet (TSV format, columns: sample, condition, ...)
 samples: samples.tsv
-# path or URL to sequencing unit sheet (TSV format, columns: sample, unit, fq1, fq2)
+
+# path to sequencing unit sheet (TSV format, columns: sample, unit, fq1, fq2)
 # Units are technical replicates (e.g. lanes, or resequencing of the same biological
 # sample).
 units: units.tsv
@@ -9,6 +10,8 @@ units: units.tsv
 cluster_json: cluster.json
 
 ref:
+  # Select the genome of the organism, needed to perform GO analyses. Supported: mouse, human.
+  genome: "mouse"
   # the STAR index
   index: "/hpcnfs/data/DP/Databases/STAR_mm10_v2_7"
   # gtf file with transcripts
@@ -20,6 +23,7 @@ pca:
     - condition
 
 diffexp:
+  # Filter thresholds to call differentially expressed genes
   pvalue: 0.05
   log2fc: 2
   # contrasts for the deseq2 results method
@@ -28,6 +32,7 @@ diffexp:
       - P1KO
       - WT
 
+# Parameters for some of the programs used in the pipeline
 params:
   star: "--outSAMtype BAM SortedByCoordinate \
         --outSAMattributes Standard \

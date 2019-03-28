@@ -18,7 +18,12 @@ res <- res[order(res$padj),]
 # TODO explore IHW usage
 saveRDS(res, file=snakemake@output[["deseqRes"]])
 
-res.filt <- as.data.frame(res) %>% rownames_to_column(var = "GeneSymbol")
+# Geneid to column, round to 3 deciamls all columns except pvalues
+pval <- res$pvalue
+padjust <- res$padj
+res.filt <- as.data.frame(res) %>% rownames_to_column(var = "Geneid") %>% round_df(2)
+res.filt$pvalue <- pval
+res.filt$padj <- padjust
 
 # store results
 pdf(snakemake@output[["ma_plot"]])
@@ -29,4 +34,4 @@ pdf(snakemake@output[["pval_hist"]])
 qplot(res.filt$pvalue, xlab = "p-value", ylab = "count")
 dev.off()
 
-write.table( round_df(res.filt,3), file=snakemake@output[["table"]], sep = "\t", quote = F, row.names = F )
+write.table( res.filt, file=snakemake@output[["table"]], sep = "\t", quote = F, row.names = F ) 

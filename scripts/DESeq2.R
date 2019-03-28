@@ -20,7 +20,7 @@ counts <- plyr::join_all(read_files, type='inner', by = "Geneid") %>%
 
 
 #------------------------- DESeq2 workflow ------------------------------
-colData <- read.table("samples.tsv", header=TRUE)
+colData <- read.table(snakemake@params[["samples"]], header=TRUE)
 
 # Counts and colData must have the same order
 counts_ordered <- counts[as.character(colData$sample)]
