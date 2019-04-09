@@ -31,6 +31,15 @@ diffexp:
     P1KO-vs-WT:
       - P1KO
       - WT
+    P24KO-vs-WT:
+      - P24KO
+      - WT
+    P35KO-vs-WT:
+      - P35KO
+      - WT
+    P6KO-vs-WT:
+      - P6KO
+      - WT
 
 # Parameters for some of the programs used in the pipeline
 params:

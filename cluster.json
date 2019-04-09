@@ -3,7 +3,7 @@
     {
         "cpu"         : 1,
         "email"       : "ieo4462@ieo.it",
-        "EmailNotice" : "a",
+        "EmailNotice" : "n",
         "jname"       : "{rule}.{wildcards}",
         "output"      : ".clusterLogs/{rule}.{wildcards}.out",
         "error"       : ".clusterLogs/{rule}.{wildcards}.err",
@@ -11,23 +11,28 @@
     },
     "fastp" :
     {
-        "cpu" : 2
+        "cpu" : 10
     },
     "fastqc":
     {
-        "cpu" : 2
+        "cpu" : 1
     },
     "star":
     {
-        "cpu" : 2,
+        "cpu" : 10,
         "MaxMem" : 40
     },
     "featureCounts":
     {
-        "cpu" : 2
+        "cpu" : 5
     },
     "deseq2":
     {
-        "MaxMem" : 16
+        "MaxMem" : 16,
+        "EmailNotice": "e"
+    },
+    "deg_analysis":
+    {   
+        "EmailNotice": "e"
     }
 }

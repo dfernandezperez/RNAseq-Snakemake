@@ -34,8 +34,8 @@ rule fastp_pe:
 		fw = lambda w: expand("fastq/{lane.sample}-{lane.lane}.1.fastq.gz", lane=units.loc[w.sample].itertuples()),
 		rv = lambda w: expand("fastq/{lane.sample}-{lane.lane}.2.fastq.gz", lane=units.loc[w.sample].itertuples())
 	output: 
-		fastq1 = "fastq/{sample}.1.fastq",
-		fastq2 = "fastq/{sample}.2.fastq"
+		fastq1 = temp("fastq/{sample}.1.fastq"),
+		fastq2 = temp("fastq/{sample}.2.fastq")
 	log: 
 		"00log/fastp/{sample}.log"
 	threads: 
@@ -67,7 +67,7 @@ rule fastp_se:
 	input:
 		lambda w: expand("fastq/{lane.sample}-{lane.lane}.fastq.gz", lane=units.loc[w.sample].itertuples()),
 	output: 
-		"fastq/{sample}.se.fastq"
+		temp("fastq/{sample}.se.fastq")
 	log: 
 		"00log/fastp/{sample}.log"
 	threads: 

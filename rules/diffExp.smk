@@ -5,7 +5,7 @@ rule deseq2:
         rds         = "04deseq2/all.rds",
         norm_counts = "04deseq2/Normalized_counts.tsv"
     params:
-        samples=config["samples"]
+        samples = config["samples"]
     log:
         "00log/deseq2/init.log"
     script:

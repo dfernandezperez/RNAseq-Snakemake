@@ -158,9 +158,9 @@ rule multiqc:
         expand("02alignments/{sample}/Log.final.out", sample = SAMPLES),
         expand("03featureCounts/{sample}/{sample}.featureCounts.summary", sample = SAMPLES),
         expand("01qc/rseqc/{sample}.stats.txt", sample = SAMPLES),
-        expand("01qc/rseqc/{sample}.inner_distance_freq.inner_distance_plot.r", sample = SAMPLES),
+        expand("01qc/rseqc/{sample}.inner_distance_freq.inner_distance.txt", sample = SAMPLES),
         expand("01qc/rseqc/{sample}.read_distribution.txt", sample = SAMPLES),
-        expand("01qc/rseqc/{sample}.readdup.DupRate_plot.r", sample = SAMPLES)
+
     output:
         "01qc/multiqc_report.html"
     log:

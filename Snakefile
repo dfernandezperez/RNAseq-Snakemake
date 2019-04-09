@@ -24,12 +24,8 @@ SAMPLES = set(units["sample"])
 
 rule all: 
 	input:
-		expand("04deseq2/{contrast}/{contrast}_diffexp.tsv", contrast = config["diffexp"]["contrasts"]),
 		"04deseq2/pca.pdf",
 		"01qc/multiqc_report.html",
-		expand("04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}/{contrast}_diffexp_log2fc{log2fc}_pval{pvalue}.tsv", contrast = config["diffexp"]["contrasts"], 
-																		pvalue = config["diffexp"]["pvalue"], 
-																		log2fc = config["diffexp"]["log2fc"]),
 		expand("04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}/{contrast}_enrichments_log2fc{log2fc}_pval{pvalue}.xlsx", contrast = config["diffexp"]["contrasts"], 
 																		pvalue = config["diffexp"]["pvalue"], 
 																		log2fc = config["diffexp"]["log2fc"])
@@ -42,3 +38,14 @@ include: "rules/trim.smk"
 include: "rules/align.smk"
 include: "rules/diffExp.smk"
 include: "rules/qc.smk"
+
+
+##### handle possible errors, clean temp folders #####
+onsuccess:
+    shell("rm -r fastq/")
+
+onerror:
+    print("An error ocurred. Workflow aborted")
+    shell("""
+    	mail -s "An error occurred. RNA-seq snakemake workflow aborted" `whoami`@ieo.it < {log}
+    	""")
