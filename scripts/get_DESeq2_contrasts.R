@@ -33,7 +33,7 @@ res.filt$padj   <- padjust
 
 # Transform padj values that are 1 to NA (just to make nicer the volcano),
 # this was the default behaviour of DESeq2, but IHW doesn't do it
-res <- res %>% mutate(padj = ifelse(padj == 1, NA, padj))
+res.filt <- res.filt %>% mutate(padj = ifelse(padj == 1, NA, padj))
 
 # store results
 pdf(snakemake@output[["ma_plot"]])
