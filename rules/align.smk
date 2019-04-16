@@ -3,21 +3,24 @@ rule star:
         get_trimmed
     output:
         bam = "02alignments/{sample}/{sample}.bam",
+        index = "02alignments/{sample}/{sample}.bam.bai",
         log = "02alignments/{sample}/Log.final.out"
     log:
         "00log/alignments/{sample}.log"
     params:
-        tmp_bam = "02alignments/{sample}/Aligned.sortedByCoord.out.bam",
-        out_dir = "02alignments/{sample}/",
+        tmp_bam     = "02alignments/{sample}/Aligned.sortedByCoord.out.bam",
+        tmp_bam2    = "02alignments/{sample}/Processed.out.bam",
+        out_dir     = "02alignments/{sample}/",
         star_params = config["params"]["star"],
         # path to STAR reference genome index
-        index   = config["ref"]["index"]
+        index       = config["ref"]["index"]
     threads:
         CLUSTER["star"]["cpu"]
     shadow: 
         "minimal"
     shell: 
         """
+        # Alignment to genome
         STAR --genomeDir {params.index} \
         --runThreadN {threads} \
         --readFilesIn {input} \
@@ -25,8 +28,15 @@ rule star:
         --outStd Log \
         {params.star_params} > {log} 2>&1
 
+        # Mark PCR duplicates
+        STAR --runThreadN {threads} \
+        --runMode inputAlignmentsFromBAM \
+        --bamRemoveDuplicatesType UniqueIdentical \
+        --inputBAMfile {params.tmp_bam} \
+        --outFileNamePrefix {params.out_dir}
+
         # Remove duplicates marked by STAR with the flag 0x400
-        samtools view -@ {threads} -b -F 0x400 {params.tmp_bam} > {output.bam}
+        samtools view -@ {threads} -b -F 0x400 {params.tmp_bam2} > {output.bam}
         samtools index {output.bam}
         """
 

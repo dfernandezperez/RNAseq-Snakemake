@@ -25,7 +25,7 @@ pca:
 diffexp:
   # Filter thresholds to call differentially expressed genes
   pvalue: 0.05
-  log2fc: 2
+  log2fc: 3
   # contrasts for the deseq2 results method
   contrasts:
     P1KO-vs-WT:
@@ -45,8 +45,7 @@ diffexp:
 params:
   star: "--outSAMtype BAM SortedByCoordinate \
         --outSAMattributes Standard \
-        --outFilterMultimapNmax 1 \
-        --bamRemoveDuplicatesType UniqueIdentical"
+        --outFilterMultimapNmax 1"
   featureCounts: "-s 0 -t exon -g gene_name"
   fastp-se: "--stdin -t 1 -A -Q -L"
   fastp-pe: "-t 1 -A -Q -L"
