@@ -8,8 +8,6 @@ rule star:
     log:
         "00log/alignments/{sample}.log"
     params:
-        tmp_bam     = "02alignments/{sample}/Aligned.sortedByCoord.out.bam",
-        tmp_bam2    = "02alignments/{sample}/Processed.out.bam",
         out_dir     = "02alignments/{sample}/",
         star_params = config["params"]["star"],
         # path to STAR reference genome index
@@ -20,24 +18,17 @@ rule star:
         "minimal"
     shell: 
         """
-        # Alignment to genome
         STAR --genomeDir {params.index} \
         --runThreadN {threads} \
         --readFilesIn {input} \
         --outFileNamePrefix {params.out_dir} \
-        --outStd Log \
-        {params.star_params} > {log} 2>&1
-
-        # Mark PCR duplicates
-        STAR --runThreadN {threads} \
-        --runMode inputAlignmentsFromBAM \
-        --bamRemoveDuplicatesType UniqueIdentical \
-        --inputBAMfile {params.tmp_bam} \
-        --outFileNamePrefix {params.out_dir}
-
-        # Remove duplicates marked by STAR with the flag 0x400
-        samtools view -@ {threads} -b -F 0x400 {params.tmp_bam2} > {output.bam}
-        samtools index {output.bam}
+        --outSAMtype SAM \
+        --outStd SAM \
+        {params.star_params} 2> {log} \
+        | samblaster --removeDups \
+        | samtools view -Sb -F 4 - \
+        | samtools sort -m 5G -@ {threads} -T {output.bam}.tmp -o {output.bam} - 2>> {log}
+        samtools index {output} 2>> {log}
         """
 
 

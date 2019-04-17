@@ -43,8 +43,7 @@ diffexp:
 
 # Parameters for some of the programs used in the pipeline
 params:
-  star: "--outSAMtype BAM SortedByCoordinate \
-        --outSAMattributes Standard \
+  star: "--outSAMattributes Standard \
         --outFilterMultimapNmax 1"
   featureCounts: "-s 0 -t exon -g gene_name"
   fastp-se: "--stdin -t 1 -A -Q -L"
