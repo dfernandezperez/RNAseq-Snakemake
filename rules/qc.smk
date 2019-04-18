@@ -160,7 +160,7 @@ rule multiqc:
         expand("01qc/rseqc/{sample}.stats.txt", sample = SAMPLES),
         expand("01qc/rseqc/{sample}.inner_distance_freq.inner_distance.txt", sample = SAMPLES),
         expand("01qc/rseqc/{sample}.read_distribution.txt", sample = SAMPLES),
-
+        expand("00log/alignments/{sample}_rmdup.log"),
     output:
         "01qc/multiqc_report.html"
     log:

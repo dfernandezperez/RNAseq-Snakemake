@@ -2,11 +2,12 @@ rule star:
     input:
         get_trimmed
     output:
-        bam = "02alignments/{sample}/{sample}.bam",
+        bam   = "02alignments/{sample}/{sample}.bam",
         index = "02alignments/{sample}/{sample}.bam.bai",
-        log = "02alignments/{sample}/Log.final.out"
+        log   = "02alignments/{sample}/Log.final.out"
     log:
-        "00log/alignments/{sample}.log"
+       align   = "00log/alignments/{sample}.log",
+       rm_dups = "00log/alignments/{sample}_rmdup.log",
     params:
         out_dir     = "02alignments/{sample}/",
         star_params = config["params"]["star"],
@@ -24,11 +25,11 @@ rule star:
         --outFileNamePrefix {params.out_dir} \
         --outSAMtype SAM \
         --outStd SAM \
-        {params.star_params} 2> {log} \
-        | samblaster --removeDups \
+        {params.star_params} 2> {log.align} \
+        | samblaster --removeDups 2> {log.rm_dups} \
         | samtools view -Sb -F 4 - \
-        | samtools sort -m 5G -@ {threads} -T {output.bam}.tmp -o {output.bam} - 2>> {log}
-        samtools index {output} 2>> {log}
+        | samtools sort -m 5G -@ {threads} -T {output.bam}.tmp -o {output.bam} - 2>> {log.align}
+        samtools index {output} 2>> {log.align}
         """
 
 
