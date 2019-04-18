@@ -7,7 +7,7 @@ rule star:
         log   = "02alignments/{sample}/Log.final.out"
     log:
        align   = "00log/alignments/{sample}.log",
-       rm_dups = "00log/alignments/{sample}_rmdup.log",
+       rm_dups = "00log/alignments/rm_dup/{sample}.log",
     params:
         out_dir     = "02alignments/{sample}/",
         star_params = config["params"]["star"],
