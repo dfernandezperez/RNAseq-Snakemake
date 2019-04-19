@@ -77,6 +77,17 @@ rule rseqc_readdis:
     shell:
         "read_distribution.py -r {input.bed} -i {input.bam} > {output} 2> {log}"
 
+rule rseqc_geneCoverage:
+    input:
+        bam = rules.star.output.bam,
+        bed = "01qc/rseqc/annotation.bed"
+    output:
+        "01qc/rseqc/{sample}.geneBodyCoverage.txt"
+    priority: 1
+    log:
+        "00log/rseqc/rseqc_geneCoverage/{sample}.log"
+    shell:
+        "geneBody_coverage.py -r {input.bed} -i {input.bam}  -o {output} 2> {log}"
 
 # rule rseqc_readdup:
 #     input:
@@ -161,6 +172,7 @@ rule multiqc:
         expand("01qc/rseqc/{sample}.inner_distance_freq.inner_distance_freq.txt", sample = SAMPLES),
         expand("01qc/rseqc/{sample}.read_distribution.txt", sample = SAMPLES),
         expand("00log/alignments/rm_dup/{sample}.log", sample = SAMPLES),
+        expand("01qc/rseqc/{sample}.geneBodyCoverage.txt.geneBodyCoverage.txt", sample = SAMPLES),
     output:
         "01qc/multiqc_report.html"
     log:
