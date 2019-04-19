@@ -6,6 +6,7 @@
 04deseq2/
 05results/
 fastq/
+log.txt
 
 .bash_history
 .cache/

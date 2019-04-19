@@ -55,7 +55,7 @@ rule rseqc_innerdis:
         bam = rules.star.output.bam,
         bed = "01qc/rseqc/annotation.bed"
     output:
-        "01qc/rseqc/{sample}.inner_distance_freq.inner_distance.txt"
+        "01qc/rseqc/{sample}.inner_distance_freq.inner_distance_freq.txt"
     priority: 1
     log:
         "00log/rseqc/rseqc_innerdis/{sample}.log"
@@ -82,12 +82,16 @@ rule rseqc_geneCoverage:
         bam = rules.star.output.bam,
         bed = "01qc/rseqc/annotation.bed"
     output:
-        "01qc/rseqc/{sample}.geneBodyCoverage.txt"
+        "01qc/rseqc/{sample}.geneBodyCoverage.geneBodyCoverage.txt"
+    params:
+        prefix="01qc/rseqc/{sample}.geneBodyCoverage"
     priority: 1
+    shadow:
+        "minimal"
     log:
         "00log/rseqc/rseqc_geneCoverage/{sample}.log"
     shell:
-        "geneBody_coverage.py -r {input.bed} -i {input.bam}  -o {output} 2> {log}"
+        "geneBody_coverage.py -r {input.bed} -i {input.bam}  -o {params.prefix} 2> {log}"
 
 # rule rseqc_readdup:
 #     input:
@@ -172,7 +176,7 @@ rule multiqc:
         expand("01qc/rseqc/{sample}.inner_distance_freq.inner_distance_freq.txt", sample = SAMPLES),
         expand("01qc/rseqc/{sample}.read_distribution.txt", sample = SAMPLES),
         expand("00log/alignments/rm_dup/{sample}.log", sample = SAMPLES),
-        expand("01qc/rseqc/{sample}.geneBodyCoverage.txt.geneBodyCoverage.txt", sample = SAMPLES),
+        expand("01qc/rseqc/{sample}.geneBodyCoverage.geneBodyCoverage.txt", sample = SAMPLES),
     output:
         "01qc/multiqc_report.html"
     log:
