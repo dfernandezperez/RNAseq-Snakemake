@@ -79,8 +79,9 @@ rule rseqc_readdis:
 
 rule rseqc_geneCoverage:
     input:
-        bam = rules.star.output.bam,
-        bed = "01qc/rseqc/annotation.bed"
+        bam   = rules.star.output.bam,
+        index = rules.star.output.index,
+        bed   = "01qc/rseqc/annotation.bed"
     output:
         "01qc/rseqc/{sample}.geneBodyCoverage.geneBodyCoverage.txt"
     params:
