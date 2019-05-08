@@ -18,7 +18,7 @@ DEA.annot <- read.delim(snakemake@input[[1]])
 ##############################################
 
 p <- VolcanoPlot(DEA.annot, 
-                    xlim      = c(-5,5),
+                    xlim      = c(-8,8),
                     ylim      = c(0,30),
                     main      = gsub("-", " ", snakemake@params[["contrast"]]),
                     labelSize = 7,

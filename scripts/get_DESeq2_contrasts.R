@@ -9,22 +9,26 @@ library("dplyr")
 library("ggplot2")
 library("tibble")
 source("scripts/custom_functions.R")
-dds <- readRDS(snakemake@input[[1]])
 
-contrast <- c("condition", snakemake@params[["contrast"]])
+#--------------------- Read data and set contrast ---------------------------------#
+dds <- readRDS(snakemake@input[[1]])
+contrast <- paste("condition_", snakemake@params[["contrast"]][1], "_vs_", snakemake@params[["contrast"]][2], sep = "")
+
+# Set as reference for the GLM model the sample that is going to act as a control in the contrast
+dds$condition <- relevel(dds$condition, snakemake@params[["contrast"]][2])
+dds <- nbinomWaldTest(dds)
 
 # Apply IHW to weight p-values based on baseMean: https://bioconductor.org/packages/release/bioc/vignettes/IHW/inst/doc/introduction_to_ihw.html
-res <- results(dds, contrast = contrast, filterFun = ihw, alpha = 0.05)
+res <- results(dds, name = contrast, filterFun = ihw, alpha = 0.05)
 
-# shrink fold changes for lowly expressed genes, use the new ashr method: https://bioconductor.org/packages/release/bioc/vignettes/apeglm/inst/doc/apeglm.html#references
-# Would be nice to use the apglm method also described in the paper, but can't be used with 'contrast', but with 'coef'	
-# Finally I decided to keep the normal mode, we'll have to test more this
-res <- lfcShrink(dds, contrast = contrast, res = res)
 
-# sort by p-value
+#--------------------- Get DEG genes, lfcshrink and volcano ---------------------------------#
+# shrink fold changes for lowly expressed genes, use the new apglm method: https://bioconductor.org/packages/release/bioc/vignettes/apeglm/inst/doc/apeglm.html#references
+# https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/bty895/5159452
+res <- lfcShrink(dds = dds, coef = contrast, res = res, type = "apeglm")
+
+# Put nice the DEG table: sort by p-value, Geneid to column, round to 2 deciamls all columns except pvalues
 res <- res[order(res$padj),]
-
-# Geneid to column, round to 2 deciamls all columns except pvalues
 pval            <- res$pvalue
 padjust         <- res$padj
 res.filt        <- as.data.frame(res) %>% rownames_to_column(var = "Geneid") %>% round_df(2)
