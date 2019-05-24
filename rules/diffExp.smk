@@ -4,7 +4,7 @@ rule deseq2:
     output:
         rds         = "04deseq2/all.rds",
         norm_counts = "04deseq2/Normalized_counts.tsv",
-        norm_counts = "04deseq2/Raw_counts.tsv"
+        raw_counts = "04deseq2/Raw_counts.tsv"
     params:
         samples = config["samples"]
     log:
