@@ -36,6 +36,12 @@ norm_counts <- counts(dds, normalized = T) %>%
 				round(3) %>% 
 				rownames_to_column(var = "Geneid")
 
+raw_counts <- counts(dds, normalized = FALSE) %>% 
+				data.frame %>% 
+				round(3) %>% 
+				rownames_to_column(var = "Geneid")
+
 write.table(norm_counts, snakemake@output[["norm_counts"]], sep = "\t", quote = F, row.names = FALSE)
+write.table(raw_counts, snakemake@output[["raw_counts"]], sep = "\t", quote = F, row.names = FALSE)
 
 saveRDS(dds, file=snakemake@output[["rds"]])
