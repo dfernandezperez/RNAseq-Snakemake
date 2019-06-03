@@ -4,7 +4,7 @@ rule deseq2:
     output:
         rds         = "04deseq2/all.rds",
         norm_counts = "04deseq2/Normalized_counts.tsv",
-        raw_counts = "04deseq2/Raw_counts.tsv"
+        raw_counts  = "04deseq2/Raw_counts.tsv"
     params:
         samples = config["samples"]
     log:
@@ -14,7 +14,7 @@ rule deseq2:
 
 rule get_contrasts:
     input:
-        rules.deseq2.output
+        rules.deseq2.output.rds
     output:
         table     = "04deseq2/{contrast}/{contrast}_diffexp.tsv",
         ma_plot   = "04deseq2/{contrast}/{contrast}_ma-plot.pdf",
