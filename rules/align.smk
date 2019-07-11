@@ -29,7 +29,7 @@ rule star:
         | samblaster --removeDups 2> {log.rm_dups} \
         | samtools view -Sb -F 4 - \
         | samtools sort -m 5G -@ {threads} -T {output.bam}.tmp -o {output.bam} - 2>> {log.align}
-        samtools index {output.index} 2>> {log.align}
+        samtools index {output.bam} 2>> {log.align}
         """
 
 
