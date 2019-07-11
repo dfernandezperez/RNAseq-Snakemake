@@ -179,27 +179,27 @@ rule multiQC_inputs:
         expand("00log/alignments/rm_dup/{sample}.log", sample = SAMPLES),
         expand("01qc/rseqc/{sample}.geneBodyCoverage.geneBodyCoverage.txt", sample = SAMPLES),
     output: 
-        file = "01qc/multiqc_inputs.txt"
+        file = "01qc/multiqc/multiqc_inputs.txt"
     message:
         "create file containing all multiqc input files"
     run:
         with open(output.file, 'w') as outfile:
             for fname in input:
-                    outfile.write(fname)
+                    outfile.write(fname + "\n")
 
 rule multiQC:
     input:
-        "01qc/multiqc_inputs.txt"
+        "01qc/multiqc/multiqc_inputs.txt"
     output: 
-        "01qc/multiqc_report.html"
+        "01qc/multiqc/multiqc_report.html"
     params:
         log_name = "multiqc_report",
-        folder = "01qc"
+        folder   = "01qc/multiqc"
     log:
-        "00log/multiqc.log"
+        "00log/multiqc/multiqc.log"
     message:
         "multiqc for all logs"
     shell:
         """
-        multiqc {input} -o {params.folder} -l {input} -f -v -n {params.log_name} 2> {log}
+        multiqc -o {params.folder} -l {input} -f -v -n {params.log_name} 2> {log}
         """
