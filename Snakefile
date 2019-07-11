@@ -13,10 +13,10 @@ configfile: "config.yaml"
 # validate(config, schema="schemas/config.schema.yaml")
 CLUSTER = json.load(open(config['cluster_json']))
 
-samples = pd.read_table(config["samples"]).set_index("sample", drop=False)
+samples = pd.read_csv(config["samples"], sep = "\t").set_index("sample", drop=False)
 # validate(samples, schema="schemas/samples.schema.yaml")
 
-units = pd.read_table(config["units"], dtype=str).set_index(["sample", "lane"], drop=False)
+units = pd.read_csv(config["units"], dtype = str, sep = "\t").set_index(["sample", "lane"], drop=False)
 units.index = units.index.set_levels([i.astype(str) for i in units.index.levels])  # enforce str in index
 # validate(units, schema="schemas/units.schema.yaml")
 
