@@ -57,10 +57,29 @@ rule featureCounts:
         featureCounts -T {threads} \
         -a {params.gtf} \
         -o {output.featureCounts} \
-        {params.pair_end} {params.options} {input} > {log} 2>&1
+        {params.pair_end} {params.options} -R SAM {input} > {log} 2>&1
 
         # Create a file with the counts, another for RPKM and another for TPM
         cut -f 1,7 {output.featureCounts} | tail -n +2 > {output.counts}
         seqdepth=$(awk '{{sum+=$2}}END{{print sum}}' {output.counts})
         awk -v s=${{seqdepth}} 'BEGIN{{OFS="\t"}}NR>2{{print $1,(($7)*1000000*1000)/($6*s)}}' {output.featureCounts} > {output.rpkm}
+        """
+
+rule bam2bigwig:
+    input:
+        rules.featureCounts.output.annot_sam
+    output:
+        "05bigwig/{sample}.bw"
+    params:
+        tmp = "05bigwig/{sample}_tmp"
+    log:
+        "00log/bam2bigwig/{sample}.log"
+    threads:
+        CLUSTER["bam2bigwig"]["cpu"]
+    shell:
+        """
+        fgrep -v "Unassigned_" {input} | samtools view -@ {threads} -Sb - | samtools sort -@ {threads} -o {params.tmp}
+	samtools index {params.tmp}
+	bamCoverage --normalizeUsing CPM -p {threads} -bs 1 -b {params.tmp} -o {output} 2> {log}
+        rm {params.tmp} {params.tmp}.bai
         """

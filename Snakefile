@@ -26,6 +26,7 @@ rule all:
 	input:
 		"04deseq2/pca.pdf",
 		"01qc/multiqc/multiqc_report.html",
+		expand("05bigwig/{sample}.bw", sample = SAMPLES),
 		expand("04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}/{contrast}_enrichments_log2fc{log2fc}_pval{pvalue}.xlsx", contrast = config["diffexp"]["contrasts"], 
 																		pvalue = config["diffexp"]["pvalue"], 
 																		log2fc = config["diffexp"]["log2fc"])
