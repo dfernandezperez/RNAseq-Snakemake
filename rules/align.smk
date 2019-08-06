@@ -37,6 +37,7 @@ rule featureCounts:
     input:
          rules.star.output.bam
     output:
+	annot_sam = temp("03featureCounts/{sample}/{sample}.bam.featureCounts.sam"),
         featureCounts = "03featureCounts/{sample}/{sample}.featureCounts",
         summary       = "03featureCounts/{sample}/{sample}.featureCounts.summary",
         counts        = "03featureCounts/{sample}/{sample}.counts",
