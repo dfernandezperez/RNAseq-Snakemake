@@ -1,39 +1,39 @@
 {
-    "__default__" :
-    {
-        "cpu"         : 1,
-        "email"       : "`whoami`@ieo.it",
-        "EmailNotice" : "n",
-        "jname"       : "{rule}.{wildcards}",
-        "output"      : ".clusterLogs/{rule}.{wildcards}.out",
-        "error"       : ".clusterLogs/{rule}.{wildcards}.err",
-        "MaxMem"      : 8
-    },
-    "fastp" :
-    {
-        "cpu" : 10
-    },
-    "fastqc":
-    {
-        "cpu" : 1
-    },
-    "star":
-    {
-        "cpu" : 10,
-        "MaxMem" : 40
-    },
-    "featureCounts":
-    {
-        "cpu" : 5
-    },
-    "deseq2":
-    {
-        "MaxMem" : 16,
-        "EmailNotice": "e"
-    },
-    "deg_analysis":
-    {   
-        "EmailNotice": "e"
+	"__default__" :
+	{
+		"cpu"         : 1,
+		"email"       : "`whoami`@ieo.it",
+		"EmailNotice" : "n",
+		"jname"       : "{rule}.{wildcards}",
+		"output"      : ".clusterLogs/{rule}.{wildcards}.out",
+		"error"       : ".clusterLogs/{rule}.{wildcards}.err",
+		"MaxMem"      : 8
+	},
+	"fastp" :
+	{
+		"cpu" : 10
+	},
+	"fastqc":
+	{
+		"cpu" : 1
+	},
+	"star":
+	{
+		"cpu" : 10,
+		"MaxMem" : 40
+	},
+	"featureCounts":
+	{
+		"cpu" : 5
+	},
+	"deseq2":
+	{
+		"MaxMem" : 16,
+		"EmailNotice": "e"
+	},
+	"deg_analysis":
+	{
+		"EmailNotice": "e"
 	},
 	"bam2bigwig":
 	{

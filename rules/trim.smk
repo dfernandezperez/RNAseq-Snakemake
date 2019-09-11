@@ -1,32 +1,32 @@
 def get_fastq(wildcards):
-    return units.loc[(wildcards.sample, wildcards.lane), ["fq1", "fq2"]].dropna()
+	return units.loc[(wildcards.sample, wildcards.lane), ["fq1", "fq2"]].dropna()
 
 rule cp_fastq_pe:
-    input: 
-        get_fastq
-    output: 
-        fastq1=temp("fastq/{sample}-{lane}.1.fastq.gz"),
-        fastq2=temp("fastq/{sample}-{lane}.2.fastq.gz")
-    message: 
-        "Copying fastq files {input}"
-    shell:
-        """
-        ln -s {input[0]} {output.fastq1}
-        ln -s {input[1]} {output.fastq2}
-        """
+	input: 
+		get_fastq
+	output: 
+		fastq1=temp("fastq/{sample}-{lane}.1.fastq.gz"),
+		fastq2=temp("fastq/{sample}-{lane}.2.fastq.gz")
+	message: 
+		"Copying fastq files {input}"
+	shell:
+		"""
+		ln -s {input[0]} {output.fastq1}
+		ln -s {input[1]} {output.fastq2}
+		"""
 
 
 rule cp_fastq_se:
-    input: 
-        get_fastq
-    output: 
-        temp("fastq/{sample}-{lane}.fastq.gz"),
-    message: 
-        "Copying fastq files {input}"
-    shell:
-        """
-        ln -s {input} {output}
-        """
+	input: 
+		get_fastq
+	output: 
+		temp("fastq/{sample}-{lane}.fastq.gz"),
+	message: 
+		"Copying fastq files {input}"
+	shell:
+		"""
+		ln -s {input} {output}
+		"""
 
 
 rule fastp_pe:
