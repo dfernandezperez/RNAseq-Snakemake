@@ -43,10 +43,14 @@ include: "rules/qc.smk"
 
 ##### handle possible errors, clean temp folders #####
 onsuccess:
-    shell("rm -r fastq/")
+    shell("""
+    rm -r fastq/
+    qselect -u `whoami` -s E | xargs qdel -Wforce
+    """)
 
 onerror:
     print("An error ocurred. Workflow aborted")
     shell("""
+	qselect -u `whoami` -s E | xargs qdel -Wforce
     	mail -s "An error occurred. RNA-seq snakemake workflow aborted" `whoami`@ieo.it < {log}
     	""")
