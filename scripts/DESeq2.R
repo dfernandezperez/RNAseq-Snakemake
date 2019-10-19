@@ -21,14 +21,19 @@ counts <- plyr::join_all(read_files, type='inner', by = "Geneid") %>%
 
 #------------------------- DESeq2 workflow ------------------------------
 colData <- read.table(snakemake@params[["samples"]], header=TRUE)
+# Remove unwanted samples (outliers, for example)
+if(!is.null(snakemake@params[["exclude"]])) {
+	colData <- colData %>% filter( !sample %in% snakemake@params[["exclude"]] )
+}
 
-# Counts and colData must have the same order
+# Counts and colData must have the same order and samples
 counts_ordered <- counts[as.character(colData$sample)]
 stopifnot(identical(colnames(counts_ordered), as.character(colData$sample)))
 
+
 dds <- DESeqDataSetFromMatrix(countData = counts_ordered,
-                              colData   = colData,
-                              design    = ~ condition)
+							  colData   = colData,
+							  design    = ~ condition)
 dds <- DESeq(dds)
 
 norm_counts <- counts(dds, normalized = T) %>% 

@@ -23,6 +23,8 @@ pca:
     - condition
 
 diffexp:
+  # samples to ignore
+  exclude: 
   # Filter thresholds to call differentially expressed genes
   pvalue: 0.05
   log2fc: 1.5

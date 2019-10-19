@@ -6,7 +6,8 @@ rule deseq2:
 		norm_counts = "04deseq2/Normalized_counts.tsv",
 		raw_counts  = "04deseq2/Raw_counts.tsv"
 	params:
-		samples = config["samples"]
+		samples = config["samples"],
+		exclude = config["diffexp"].get("exclude", None)
 	log:
 		"00log/deseq2/init.log"
 	script:
