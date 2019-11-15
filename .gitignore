@@ -4,7 +4,7 @@
 02alignments/
 03featureCounts/
 04deseq2/
-05results/
+05bigwig/
 fastq/
 log.txt
 

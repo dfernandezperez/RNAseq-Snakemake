@@ -47,7 +47,7 @@ KEGGenrichment <- function(df, org = "mmu", db = org.Mm.eg.db) {
                      pAdjustMethod = "BH",
                      pvalueCutoff  = 0.05,
                      qvalueCutoff  = 0.1)
-  ekgg <- DOSE::setReadable(ekgg, OrgDb = db, keytype="ENTREZID")
+  ekgg <- DOSE::setReadable(ekgg, OrgDb = db, keyType="ENTREZID")
   return(ekgg)
 }
 
