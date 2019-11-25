@@ -9,9 +9,13 @@
 		"error"       : ".clusterLogs/{rule}.{wildcards}.err",
 		"MaxMem"      : 8
 	},
-	"fastp" :
+	"fastp_pe" :
 	{
-		"cpu" : 10
+		"cpu" : 5
+	},
+	"fastp_se" :
+	{
+		"cpu" : 5
 	},
 	"fastqc":
 	{
@@ -19,7 +23,7 @@
 	},
 	"star":
 	{
-		"cpu" : 10,
+		"cpu" : 8,
 		"MaxMem" : 40
 	},
 	"featureCounts":
@@ -37,6 +41,6 @@
 	},
 	"bam2bigwig":
 	{
-		"cpu" : 5
+		"cpu" : 1
 	}
 }
