@@ -39,7 +39,7 @@ rule fastp_pe:
 	log: 
 		"00log/fastp/{sample}.log"
 	threads: 
-		CLUSTER["fastp"]["cpu"]
+		CLUSTER["fastp_pe"]["cpu"]
 	params: 
 		fastp_params = config["params"]["fastp-pe"],
 		tmp_fw       = "fastq/{sample}.1.fastq.tmp.gz",
@@ -71,7 +71,7 @@ rule fastp_se:
 	log: 
 		"00log/fastp/{sample}.log"
 	threads: 
-		CLUSTER["fastp"]["cpu"]
+		CLUSTER["fastp_se"]["cpu"]
 	params: 
 		fastp_params = config["params"]["fastp-se"],
 	message: 
