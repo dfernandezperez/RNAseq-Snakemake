@@ -1,0 +1,20 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 28
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	deseq2
+	1
+
+[Mon Oct 28 12:25:05 2019]
+rule deseq2:
+    input: 03featureCounts/ISC-Pcgf1KO-rep2/ISC-Pcgf1KO-rep2.counts, 03featureCounts/ISC-Pcgf24KO-rep1/ISC-Pcgf24KO-rep1.counts, 03featureCounts/ISC-Pcgf1KO-rep1/ISC-Pcgf1KO-rep1.counts, 03featureCounts/ISC-WT-rep2/ISC-WT-rep2.counts, 03featureCounts/ISC-Pcgf35KO-rep2/ISC-Pcgf35KO-rep2.counts, 03featureCounts/ISC-WT-rep1/ISC-WT-rep1.counts, 03featureCounts/ISC-Pcgf6KO-rep2/ISC-Pcgf6KO-rep2.counts, 03featureCounts/ISC-Pcgf35KO-rep1/ISC-Pcgf35KO-rep1.counts, 03featureCounts/ISC-Pcgf6KO-rep1/ISC-Pcgf6KO-rep1.counts, 03featureCounts/ISC-Pcgf24KO-rep2/ISC-Pcgf24KO-rep2.counts
+    output: 04deseq2/all.rds, 04deseq2/Normalized_counts.tsv, 04deseq2/Raw_counts.tsv
+    log: 00log/deseq2/init.log
+    jobid: 0
+
+Activating singularity image /hpcnfs/data/DP/Singularity/rnaseq-snakemake.simg
+[Mon Oct 28 12:26:06 2019]
+Finished job 0.
+1 of 1 steps (100%) done

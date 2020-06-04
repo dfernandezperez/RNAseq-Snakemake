@@ -1,0 +1,22 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 28
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	rseqc_readdis
+	1
+
+[Mon Oct 28 11:49:13 2019]
+rule rseqc_readdis:
+    input: 02alignments/ISC-Pcgf35KO-rep1/ISC-Pcgf35KO-rep1.bam, 01qc/rseqc/annotation.bed
+    output: 01qc/rseqc/ISC-Pcgf35KO-rep1.read_distribution.txt
+    log: 00log/rseqc/rseqc_readdis/ISC-Pcgf35KO-rep1.log
+    jobid: 0
+    wildcards: sample=ISC-Pcgf35KO-rep1
+    priority: 1
+
+Activating singularity image /hpcnfs/data/DP/Singularity/rnaseq-snakemake.simg
+[Mon Oct 28 11:51:42 2019]
+Finished job 0.
+1 of 1 steps (100%) done

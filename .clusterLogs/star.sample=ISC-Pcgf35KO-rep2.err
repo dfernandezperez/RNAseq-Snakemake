@@ -1,0 +1,22 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 28
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	star
+	1
+
+[Mon Oct 28 11:35:47 2019]
+rule star:
+    input: fastq/ISC-Pcgf35KO-rep2.se.fastq
+    output: 02alignments/ISC-Pcgf35KO-rep2/ISC-Pcgf35KO-rep2.bam, 02alignments/ISC-Pcgf35KO-rep2/ISC-Pcgf35KO-rep2.bam.bai, 02alignments/ISC-Pcgf35KO-rep2/Log.final.out
+    log: 00log/alignments/ISC-Pcgf35KO-rep2.log, 00log/alignments/rm_dup/ISC-Pcgf35KO-rep2.log
+    jobid: 0
+    wildcards: sample=ISC-Pcgf35KO-rep2
+    threads: 10
+
+Activating singularity image /hpcnfs/data/DP/Singularity/rnaseq-snakemake.simg
+[Mon Oct 28 11:40:34 2019]
+Finished job 0.
+1 of 1 steps (100%) done

@@ -1,0 +1,16 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 28
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	cp_fastq_se
+	1
+
+[Mon Oct 28 11:29:14 2019]
+Job 0: Copying fastq files /hpcnfs/techunits/genomics/PublicData/Pasini/spivetti/FASTQ/190225_A00302_0054_BHGHHKDMXX/Sample_S21435_LGR5-ISC-PCGF1KO-7d-BioRep1/S21435_LGR5-ISC-PCGF1KO-7d-BioRep1_S107_L002_R1_001.fastq.gz
+
+Activating singularity image /hpcnfs/data/DP/Singularity/rnaseq-snakemake.simg
+[Mon Oct 28 11:29:14 2019]
+Finished job 0.
+1 of 1 steps (100%) done

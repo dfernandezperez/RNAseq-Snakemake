@@ -1,0 +1,69 @@
+import pandas as pd
+import yaml
+from snakemake.utils import validate, min_version
+
+
+
+##### set minimum snakemake version #####
+min_version("5.4.3")
+
+##### Singularity image path
+singularity: "/hpcnfs/data/DP/Singularity/rnaseq-snakemake.simg"
+
+##### load config, cluster config and sample sheets #####
+configfile: "configuration/config.yaml"
+# validate(config, schema="schemas/config.schema.yaml")
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Load sample sheet and cluster configuration
+#-----------------------------------------------------------------------------------------------------------------------
+CLUSTER = json.load(open(config['cluster']))
+# CLUSTER     = yaml.load(open(config['cluster'], 'r'), Loader=yaml.FullLoader)
+
+samples = pd.read_csv(config["samples"], sep = "\t").set_index("sample", drop=False)
+# validate(samples, schema="schemas/samples.schema.yaml")
+
+units = pd.read_csv(config["units"], dtype = str, sep = "\t").set_index(["sample", "lane"], drop=False)
+units.index = units.index.set_levels([i.astype(str) for i in units.index.levels])  # enforce str in index
+# validate(units, schema="schemas/units.schema.yaml")
+
+SAMPLES = set(units["sample"])
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Define multiple outputs based on the output files desired
+#-----------------------------------------------------------------------------------------------------------------------
+rule all: 
+	input:
+		"results/04deseq2/pca.pdf",
+		"results/01qc/multiqc/multiqc_report.html",
+		expand("results/05bigwig/{sample}.bw", sample = SAMPLES),
+		expand("results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}/{contrast}_enrichments_log2fc{log2fc}_pval{pvalue}.xlsx", contrast = config["diffexp"]["contrasts"], 
+																		pvalue = config["diffexp"]["pvalue"], 
+																		log2fc = config["diffexp"]["log2fc"])
+		
+
+##### load rules #####
+
+include: "rules/common.smk"
+include: "rules/trim.smk"
+include: "rules/align.smk"
+include: "rules/diffExp.smk"
+include: "rules/qc.smk"
+
+##### set localrules
+localrules: all, cp_fastq_pe, cp_fastq_se
+
+##### handle possible errors, clean temp folders #####
+onsuccess:
+    shell("""
+    rm -r fastq/
+    qselect -u `whoami` -s E | xargs qdel -Wforce
+    """)
+
+onerror:
+    print("An error ocurred. Workflow aborted")
+    shell("""
+	qselect -u `whoami` -s E | xargs qdel -Wforce
+    	mail -s "An error occurred. RNA-seq snakemake workflow aborted" `whoami`@ieo.it < {log}
+    	""")

@@ -1,0 +1,21 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 28
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	get_contrasts
+	1
+
+[Mon Oct 28 12:26:34 2019]
+rule get_contrasts:
+    input: 04deseq2/all.rds
+    output: 04deseq2/P6KO-vs-WT/P6KO-vs-WT_diffexp.tsv, 04deseq2/P6KO-vs-WT/P6KO-vs-WT_ma-plot.pdf, 04deseq2/P6KO-vs-WT/P6KO-vs-WT_pval-hist.pdf
+    log: 00log/deseq2/P6KO-vs-WT.diffexp.log
+    jobid: 0
+    wildcards: contrast=P6KO-vs-WT
+
+Activating singularity image /hpcnfs/data/DP/Singularity/rnaseq-snakemake.simg
+[Mon Oct 28 12:27:31 2019]
+Finished job 0.
+1 of 1 steps (100%) done

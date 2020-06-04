@@ -1,21 +1,12 @@
 # Don't track content of these folders
-00log/
-01qc/
-02alignments/
-03featureCounts/
-04deseq2/
-05bigwig/
-fastq/
-log.txt
+results/*
 
 .bash_history
 .cache/
 .java/
 .benchmarks/
 .snakemake/
-.clusterLogs/
 .DS_Store
-snakemake.log
 
 # Compiled source #
 ###################

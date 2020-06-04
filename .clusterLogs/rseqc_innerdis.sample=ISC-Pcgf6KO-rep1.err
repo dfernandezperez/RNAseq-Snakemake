@@ -1,0 +1,22 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 28
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	rseqc_innerdis
+	1
+
+[Mon Oct 28 11:41:59 2019]
+rule rseqc_innerdis:
+    input: 02alignments/ISC-Pcgf6KO-rep1/ISC-Pcgf6KO-rep1.bam, 01qc/rseqc/annotation.bed
+    output: 01qc/rseqc/ISC-Pcgf6KO-rep1.inner_distance_freq.inner_distance_freq.txt
+    log: 00log/rseqc/rseqc_innerdis/ISC-Pcgf6KO-rep1.log
+    jobid: 0
+    wildcards: sample=ISC-Pcgf6KO-rep1
+    priority: 1
+
+Activating singularity image /hpcnfs/data/DP/Singularity/rnaseq-snakemake.simg
+[Mon Oct 28 11:42:11 2019]
+Finished job 0.
+1 of 1 steps (100%) done

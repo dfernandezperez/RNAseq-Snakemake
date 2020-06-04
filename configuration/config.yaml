@@ -1,0 +1,79 @@
+# path (from the repository root) to sample sheet (TSV format, columns: sample, condition, ...)
+samples: configuration/samples.tsv
+
+
+# path (from the repository root) to sequencing unit sheet (TSV format, columns: sample, unit, fq1, fq2)
+# Units are technical replicates (e.g. lanes, or resequencing of the same biological
+# sample).
+units: configuration/units.tsv
+
+
+# path (from the repository root) to cluster configuration. Parameters for submitting jobs to cluster via qsub
+cluster: configuration/cluster.json
+
+
+# Prefix to temporary
+# Some files -such as fastq- occupy a lot of space. To avoid space problems during the processing of the pipelines
+# we can use the temporary scratch of hpcnfs or the scratch directory of each node.
+# Just write the prefix-path where you want to put those files, or write '.' to have them in the workdir.
+# By now just fastq files will be located in this folder
+# IMPORTANT: if you have running multiple snakemake pipelines with the same tmp folder all the fastq files will be located togeter. Care with the sample names to not be repeated.
+tmp: /hpcnfs/scratch/temporary/.snakemake/rnaseq
+
+
+# perform trimming: false or true
+# if true go to params (at the end)
+# to set desired trimming parameters
+trimming: false
+
+
+ref:
+  # Select the genome of the organism, needed to perform GO analyses. Supported: mouse, human.
+  genome: "mouse"
+  # the STAR index
+  index: "/hpcnfs/data/DP/Databases/STAR_GRCm38"
+  # gtf file with transcripts
+  annotation: "/hpcnfs/data/DP/Databases/STAR_GRCm38/gencode.vM21.annotation.gtf"
+
+
+pca:
+  labels:
+    # columns of sample sheet to use for PCA
+    - condition
+
+
+diffexp:
+  # samples to ignore
+  exclude: 
+  # Filter thresholds to call differentially expressed genes
+  pvalue: 0.05
+  log2fc: 
+    - 1
+    - 1.5
+    - 2
+    - 2.5
+  # contrasts for the deseq2 results method
+  contrasts:
+    CTR_T-vs-CTR_NT:
+      - CTR_T
+      - CTR_NT
+    P6KO_NT-vs-CTR_NT:
+      - P6KO_NT
+      - CTR_NT
+    P6KO_T-vs-CTR_NT:
+      - P6KO_T
+      - CTR_NT
+
+      
+# Parameters for some of the programs used in the pipeline
+params:
+  # Memory used by every core of samtools (GB). Be careful that
+  # memory x threads is not bigger than the amount of memory assigned to align rule
+  samtools_mem: 3
+  star: "--outSAMattributes Standard \
+        --outFilterMultimapNmax 1 \
+        --readFilesCommand zcat"
+  featureCounts: "-s 0 -t exon -g gene_name"
+  # In case trimming is set to true, define trimmining parameters
+  fastp-se: "--stdin -t 1 -A -Q -L"
+  fastp-pe: "-t 1 -A -Q -L"
