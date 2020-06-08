@@ -70,7 +70,7 @@ rule fastp_pe:
         fastq1 = temp("{tmp}/fastq/trimmed/{{sample}}.1.fastq.gz".format(tmp=config["tmp"])),
         fastq2 = temp("{tmp}/fastq/trimmed/{{sample}}.2.fastq.gz".format(tmp=config["tmp"]))
     log: 
-        "00log/fastp/{sample}.log"
+        "results/00log/fastp/{sample}.log"
     threads: 
         CLUSTER["fastp_pe"]["cpu"]
     params: 
@@ -96,7 +96,7 @@ rule fastp_se:
     output: 
         temp("{tmp}/fastq/trimmed/{{sample}}.se.fastq.gz".format(tmp=config["tmp"]))
     log: 
-        "00log/fastp/{sample}.log"
+        "results/00log/fastp/{sample}.log"
     threads: 
         CLUSTER["fastp_se"]["cpu"]
     params: 

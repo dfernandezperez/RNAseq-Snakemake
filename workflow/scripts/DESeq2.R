@@ -8,7 +8,7 @@ library(dplyr)
 library(tibble)
 
 #------------------------- read count table ------------------------------
-counts <- read.delim(snakeamke@input, check.names = FALSE) %>%
+counts <- read.delim(snakemake@input[[1]], check.names = FALSE) %>%
     column_to_rownames("Geneid")
 
 

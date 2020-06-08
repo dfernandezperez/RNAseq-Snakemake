@@ -43,10 +43,13 @@ pca:
 
 
 diffexp:
-  # samples to ignore
+  # samples to ignore. Write the name of the sample
   exclude: 
   # Filter thresholds to call differentially expressed genes
-  pvalue: 0.05
+  fpkm: 
+    - 0
+  pvalue: 
+    - 0.05
   log2fc: 
     - 1
     - 1.5

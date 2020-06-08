@@ -40,30 +40,28 @@ rule fastqc:
 
 
 ##------- RSEQC -------##
-
 rule rseqc_gtf2bed:
     input:
         config["ref"]["annotation"]
     output:
-        "01qc/rseqc/annotation.bed",
+        bed  = "results/01qc/rseqc/annotation.bed",
+        pred = temp("results/01qc/rseqc/annotation.pred")
     log:
-        "00log/rseqc_gtf2bed.log"
-    shell:
-        """awk '{{ if ($0 ~ "transcript_id") print $0; else print $0" transcript_id \"\";"; }}' {input} | gtf2bed --do-not-sort - > {output}"""
-
-
-rule rseqc_gtf2bed:
-    input:
-        config["ref"]["annotation"]
-    output:
-        bed  = "01qc/rseqc/annotation.bed",
-        pred = temp("01qc/rseqc/annotation.pred")
-    log:
-        "00log/rseqc_gtf2bed.log"
+        "results/00log/rseqc_gtf2bed.log"
     shell:
         "resources/gtfToGenePred {input} {output.pred} && resources/genePredToBed {output.pred} {output.bed}"
 
-        
+rule rseqc_stat:
+    input:
+        rules.star.output.bam,
+    output:
+        "results/01qc/rseqc/{sample}.stats.txt"
+    priority: 1
+    log:
+        "results/00log/rseqc/rseqc_stat/{sample}.log"
+    shell:
+        "bam_stat.py -i {input} > {output} 2> {log}"
+
 rule rseqc_innerdis:
     input:
         bam = rules.star.output.bam,

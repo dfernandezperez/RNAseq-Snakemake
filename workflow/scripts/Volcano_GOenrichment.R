@@ -8,10 +8,12 @@ library(clusterProfiler)
 library(ReactomePA)
 library(org.Mm.eg.db)
 library(openxlsx)
-source("scripts/custom_functions.R")
+source("workflow/scripts/custom_functions.R")
 
 DEA.annot <- read.delim(snakemake@input[[1]])
 
+log2fc <- as.numeric(snakemake@params[["log2fc"]])
+pval   <- as.numeric(snakemake@params[["pval"]])
 
 ##############################################
 ##                 Volcano                  ##
@@ -22,8 +24,8 @@ p <- VolcanoPlot(DEA.annot,
                     ylim      = c(0,30),
                     main      = gsub("-", " ", snakemake@params[["contrast"]]),
                     labelSize = 7,
-                    pval      = snakemake@params[["pval"]],
-                    log2FC    = snakemake@params[["log2fc"]])
+                    pval      = pval,
+                    log2FC    = log2fc)
 
 pdf(snakemake@output[["volcano"]])
 p

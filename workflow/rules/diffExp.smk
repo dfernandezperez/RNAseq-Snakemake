@@ -1,6 +1,6 @@
 rule create_tables:
     input:
-        expand("results/03featureCounts/{sample}/{sample}.counts", sample = SAMPLES)
+        expand("results/03featureCounts/{sample}/{sample}.featureCounts", sample = SAMPLES)
     output:
         tpm         = "results/04deseq2/tpm.tsv",
         fpkm        = "results/04deseq2/fpkm.tsv",
@@ -26,13 +26,16 @@ rule deseq2:
 
 rule get_contrasts:
     input:
-        rules.deseq2.output.rds
+        rds     = rules.deseq2.output.rds,
+        fpkm    = rules.create_tables.output.fpkm
     output:
         table     = "results/04deseq2/{contrast}/{contrast}_diffexp.tsv",
         ma_plot   = "results/04deseq2/{contrast}/{contrast}_ma-plot.pdf",
         pval_hist = "results/04deseq2/{contrast}/{contrast}_pval-hist.pdf",
     params:
         contrast = lambda w: config["diffexp"]["contrasts"][w.contrast],
+        samples   = config["samples"],
+        exclude   = config["diffexp"].get("exclude", None)
     log:
         "results/00log/deseq2/{contrast}.diffexp.log"
     script:
@@ -50,33 +53,32 @@ rule pca:
     script:
         "../scripts/plot-PCA.R"
 
-
 rule filter_deg:
     input:
-        rules.get_contrasts.output.table
+        diffExp = rules.get_contrasts.output.table,
     output:
-        "results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}/{contrast}_diffexp_log2fc{log2fc}_pval{pvalue}.tsv"
+        "results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_diffexp_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.tsv"
     params:
-        pval     = config["diffexp"]["pvalue"],
-        log2fc   = config["diffexp"]["log2fc"],
+        pval      = lambda w: w.pvalue,
+        log2fc    = lambda w: w.log2fc,
+        fpkm_filt = lambda w: w.fpkm
     log:
-        "results/00log/deseq2/{contrast}.{log2fc}.{pvalue}.filter_deg.log"
+        "results/00log/deseq2/{contrast}.{log2fc}.{pvalue}_fpkm{fpkm}.filter_deg.log"
     script:
         "../scripts/filter_deg.R"
-
 
 rule deg_analysis:
     input:
         rules.filter_deg.output
     output:
-        enrichments = "results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}/{contrast}_enrichments_log2fc{log2fc}_pval{pvalue}.xlsx",
-        volcano	    = "results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}/{contrast}_volcano_log2fc{log2fc}_pval{pvalue}.pdf",
+        enrichments = "results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_enrichments_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.xls",
+        volcano	    = "results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_volcano_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.pdf",
     params:
-        pval     = config["diffexp"]["pvalue"],
-        log2fc   = config["diffexp"]["log2fc"],
+        pval     = lambda w: w.pvalue,
+        log2fc   = lambda w: w.log2fc,
         contrast = lambda w: w.contrast,
         genome   = config["ref"]["genome"],
     log:
-        "results/00log/deseq2/{contrast}.log2fc{log2fc}_pval{pvalue}.deg_analysis.log"
+        "results/00log/deseq2/{contrast}.log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.deg_analysis.log"
     script:
         "../scripts/Volcano_GOenrichment.R"   

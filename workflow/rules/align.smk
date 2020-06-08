@@ -45,7 +45,7 @@ rule featureCounts:
         rpkm          = "results/03featureCounts/{sample}/{sample}.rpkm"
         # tpm           = "results/03featureCounts/{sample}/{sample}.tpm"
     log:
-        "00log/featureCounts/{sample}.log"
+        "results/00log/featureCounts/{sample}.log"
     params:
         tmp      = "results/03featureCounts/{sample}/{sample}.seqDepth",
         gtf      = config["ref"]["annotation"],

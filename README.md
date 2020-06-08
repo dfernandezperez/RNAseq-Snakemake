@@ -39,31 +39,39 @@ Here I am using lane1 and lane2 for consistency and making things more clear, bu
 
 All metadata and information regarding every sample is located in `samples.tsv`. The file has the following structure:
 
-| NAME | INPUT | SPIKE | AB | USER | GENOME | RUN | IS_INPUT |
-|------|-------|-------|----|------|--------|-----|----------|
-| name_of_sample | input_to_use | If the sample contains spikein. true or false | antibody | user | versione of genome (i.e: mm10) | run of the sequencing | if the sample is an input |
+| sample | condition | 
+|------|-------|
+| name_of_sample | group for differential expression |
 
-* For every sample, the `NAME` field has to contain exactly the same name that was written in the `sample` column of the `units.tsv`.
+* `sample`: The name of the samples. They have to match those in `units.tsv` (1 entry per sample).
+* `condition`: This will be the grouping for the differential expression analysis. Samples with the same condition will be treated as biological replicates by DESeq2. 
 
-* The `INPUT` field contains the name of the input corresponding to the given sample. It has to be the name of the input written in the fields `sample` and `NAME` from `units.tsv` and  `samples.tsv`.
+An example of table would be:
 
-* `SPIKE`: TRUE or FALSE based on if the sample contains spike-in or not.
 
-* `AB`, `USER`, `RUN`: Metadata corresponding to each sample. If there's nothing to fill I usuallt write an X.
+| sample | condition | 
+|------|-------|
+| A-rep1 | WT |
+| A-rep2 | WT |
+| B-rep1 | KO |
+| B-rep2 | KO |
 
-* `GENOME`: Version of the genome used for the alignment. It will be used for peak annotation with ChIPseeker. Right now the accepted values are mm9, mm10, hg19 and hg38.
+If desired, this sample can be expanded by adding new columns (like genotype, batch effect, etc). By now, doing so will just allow users to do PCA plots labeling the samples based on these columns, but in the future we plan to expand this to be able to design complex model matrices to use as input to DESeq2.
 
-* `IS_INPUT`: The options are TRUE or FALSE. If the sample is an input set it to TRUE. Also, in case the sample is an input sequenced just to calculate the ratio sample/spike-in that won't be used to call peaks, set it to TRUE.
 
 
 ### Configuration of pipeline parameters
 
-In the root folder of this repository (I say this because there's in another folder a file with the same name) there is the file `config.yaml`. This files contains the configuration of the software and parameters used in the pipeline. Modify them as you wish. Check always that you are using the correct genome files corresponding to the version that you want to use. Also check the effective genome size that is used by deeptools to calculate the GC bias.
+In this configuration folder (I say this because there's in another folder a file with the same name) there is the file `config.yaml`. This file contains the configuration of the software and parameters used in the pipeline. Modify them as you wish. Check always that you are using the correct genome files corresponding to the version that you want to use. 
+
+Also here you will have to design the contrasts to perfrom differential expression analyses in the `diffexp` section of the yaml file. Define the desired adjusted p-values and log2 fold changes that will be used as thresholds to define differentially expressed genes. You can also use as an additional threshold the FPKM levels across the conditions that are compared. For example, if you don't want to consider as differentially expressed those genes that have less than 1 FPKM in both conditions, indipendently of the p-value and fold change, set fpkm to 1.
+
+Multiple threshold values can be set, so the pipeline will automatically create volcano plots, enrichment analyses and filtered tables for each combination of the thresholds that have been set.
 
 
 ### Cluster configuration
 
-`cluster.yaml` contains the per rule cluster parameters (ncpus, ram, walltime...). It can be modified as desired. In the future I want to remove this file in favour of the new [snakemake profiles](https://github.com/Snakemake-Profiles) system (see below), but I still need to understand a little bit better how it works and how to properly do the migration.
+`cluster.json` contains the per rule cluster parameters (ncpus, ram, walltime...). It can be modified as desired. In the future I want to remove this file in favour of the new [snakemake profiles](https://github.com/Snakemake-Profiles) system (see below), but I still need to understand a little bit better how it works and how to properly do the migration.
 
 
 ### Snakemake profiles
@@ -89,16 +97,18 @@ is equivalent to
 ./execute_pipeline.sh
 ```
 
-If you want to obtain also broad peaks...
+If you don't want bigwig files and QC control...
 
 ```bash
-./execute_pipeline.sh all_broad
+./execute_pipeline.sh all_noQC
 ```
 
 At the end of the `Snakefile` you will find all the possible target rules and their corresponding output files.
+
+You can modify these rules and add new all rules to get just the files that you are interested in.
 
 
 ## To Do's
 
 * Migrate 100% to snakemake profiles and stop using the `cluster.yaml` configuration.
-* Adding the input-normalization of spike-in samples in case the input is provided.
+* Add the option to downsample the count matrix based on the sample with less counts.

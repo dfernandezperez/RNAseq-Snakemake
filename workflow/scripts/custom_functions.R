@@ -10,18 +10,22 @@ round_df <- function(df, digits) {
 
 
 # Annot DE table. Useful to filter the excel file or to do a volcano plot coloring the DE and non DE genes
-Annot_DE <- function(df, log2FC = 2, padjust = 0.05) {
+Annot_DE <- function(df, log2FC = 2, padjust = 0.05, fpkm = 0) {
   require(dplyr)
-  require(tibble)
-  # df <- data.frame(df)
-  df$DEG <- "NotDE"
-  df$DEG[which(df$log2FoldChange >= log2FC & df$padj <= padjust)] <- "Upregulated" #Annotate UPregulated genes
-  df$DEG[which(df$log2FoldChange <= -log2FC & df$padj <= padjust)] <- "Downregulated" #Annotate DOWNregulated genes
+  require(purrr)
   
-  # df <- round_df(df,3) %>%
-  # rownames_to_column(var = "Geneid")
+  df <- df %>%
+    
+    mutate(max_fpkm = reduce(select(., contains("_FPKM")), pmax)) %>% # Add column with max fpkm value between conditions
+    
+    mutate(DEG = ifelse(log2FoldChange >= log2FC & padj <= padjust & max_fpkm >= fpkm, "Upregulated",
+                        ifelse(log2FoldChange <= -log2FC & padj <= padjust & max_fpkm >= fpkm, "Downregulated", "NS"))) %>%
+    
+    select(-max_fpkm) # Remove temporary max fpkm column
+  
   return(df)
 }
+
 
 
 ##-------------------- Enrichment analyses functions --------------------##

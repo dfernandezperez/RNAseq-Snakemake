@@ -17,8 +17,6 @@ do_tpm = function (counts, effective_lengths) {
 
 
 #------------------------- Preapre count table ------------------------------
-read_files <- lapply(snakemake@input, function(x) read.delim(x, header = TRUE))
-
 read_files <- snakemake@input %>%
   purrr::map(read.delim, header = TRUE, skip = 1) %>%
   purrr::map(select, 1,6,7) %>% # Select geneid, length and counts
@@ -26,7 +24,7 @@ read_files <- snakemake@input %>%
   purrr::map(~ mutate(.x, fpkm = do_fpkm(Counts,Length))) %>%
   purrr::map(~ mutate(.x, tpm  = do_tpm(Counts,Length)))
   
-sample_names <- unlist(files) %>%
+sample_names <- unlist(snakemake@input) %>%
   basename %>%
   gsub(pattern = ".featureCounts", replacement = "")
 
