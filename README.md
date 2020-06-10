@@ -1,8 +1,8 @@
-# Pasini's lab ChIP-seq pipeline
+# Pasini's lab RNA-seq pipeline
 
 [![Snakemake](https://img.shields.io/badge/snakemake-≥5.4.3-brightgreen.svg)](https://snakemake.bitbucket.io)
 
-Snakemake-based ChIP-seq pipeline to be run in our PBS-based HPC using singularity containers. The singularity image that is used to run this pipeline is created from [this](https://github.com/dfernandezperez/Docker/blob/master/ChIP-seq/Dockerfile) docker container.
+Snakemake-based RNA-seq pipeline to be run in our PBS-based HPC using singularity containers. The singularity image that is used to run this pipeline is created from [this](https://github.com/dfernandezperez/Docker/blob/master/RNA-seq/Dockerfile) docker container.
 
 ## Setup
 
