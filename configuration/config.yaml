@@ -27,6 +27,10 @@ tmp: /hpcnfs/scratch/temporary/.snakemake/rnaseq
 trimming: false
 
 
+# Set seed for downsampling
+seed: 1234
+
+
 ref:
   # Select the genome of the organism, needed to perform GO analyses. Supported: mouse, human.
   genome: "mouse"

@@ -1,4 +1,6 @@
-##-------------------- Filtering and annotation of DE tables --------------------##
+#----------------------------------------------------------------------------------------------
+# Filtering and annotation of DE tables
+#----------------------------------------------------------------------------------------------
 #Function to round all numeric colums of dataframe
 round_df <- function(df, digits) {
   nums <- vapply(df, is.numeric, FUN.VALUE = logical(1))
@@ -13,22 +15,53 @@ round_df <- function(df, digits) {
 Annot_DE <- function(df, log2FC = 2, padjust = 0.05, fpkm = 0) {
   require(dplyr)
   require(purrr)
-  
-  df <- df %>%
     
-    mutate(max_fpkm = reduce(select(., contains("_FPKM")), pmax)) %>% # Add column with max fpkm value between conditions
+    df <- mutate(df, max_fpkm = reduce(select(df, contains("_FPKM")), pmax)) # Add column with max fpkm value between conditions
     
-    mutate(DEG = ifelse(log2FoldChange >= log2FC & padj <= padjust & max_fpkm >= fpkm, "Upregulated",
-                        ifelse(log2FoldChange <= -log2FC & padj <= padjust & max_fpkm >= fpkm, "Downregulated", "NS"))) %>%
+    df$DEG <- "NS"
+    df$DEG[which(df$log2FoldChange >= log2FC & df$padj <= padjust & df$max_fpkm >= fpkm)] <- "Upregulated" #Annotate UPregulated genes
+    df$DEG[which(df$log2FoldChange <= -log2FC & df$padj <= padjust & df$max_fpkm >= fpkm)] <- "Downregulated" #Annotate DOWNregulated genes
     
-    select(-max_fpkm) # Remove temporary max fpkm column
+    df <- select(df, -max_fpkm) # Remove temporary max fpkm column
   
   return(df)
 }
 
 
+#----------------------------------------------------------------------------------------------
+# Functions to transform counts into fpkm and tpm
+#----------------------------------------------------------------------------------------------
+do_fpkm = function (counts, effective_lengths) {
+  exp(log(counts) - log(effective_lengths) - log(sum(counts)) + log(1E9))
+}
 
-##-------------------- Enrichment analyses functions --------------------##
+do_tpm = function (counts, effective_lengths) {
+  rate = log(counts) - log(effective_lengths)
+  exp(rate - log(sum(exp(rate))) + log(1E6))
+}
+
+
+#----------------------------------------------------------------------------------------------
+# Function to downsample count matrix
+#----------------------------------------------------------------------------------------------
+Down_Sample_Matrix <-
+function (expr_mat) 
+{
+    min_lib_size <- min(colSums(expr_mat))
+    down_sample <- function(x) {
+        prob <- min_lib_size/sum(x)
+        return(unlist(lapply(x, function(y) {
+            rbinom(1, y, prob)
+        })))
+    }
+    down_sampled_mat <- apply(expr_mat, 2, down_sample)
+    return(down_sampled_mat)
+}
+
+
+#----------------------------------------------------------------------------------------------
+# Enrichment analyses functions
+#----------------------------------------------------------------------------------------------
 goEnrichment <- function(df, ont = "BP", db = org.Mm.eg.db) {
   require(clusterProfiler)
   require(db)
@@ -86,10 +119,12 @@ GSEA_enrichment <- function(df, pathways.gmt) {
 
 
 
-##-------------------- Plots --------------------##
-VolcanoPlot <- function(df, xlim=NULL, ylim=NULL, main = NULL, labelSize = 7, pval = 0.1, log2FC = 1) {
+#----------------------------------------------------------------------------------------------
+# Plots
+#----------------------------------------------------------------------------------------------
+VolcanoPlot <- function(df, xlim=NULL, ylim=NULL, main = NULL, labelSize = 8, pval = 0.05, log2FC = 1) {
   require(ggplot2)
-  require(ggrastr)
+  # require(ggrastr)
 
   df <- mutate(df, shape = "circle")
 
@@ -117,7 +152,6 @@ VolcanoPlot <- function(df, xlim=NULL, ylim=NULL, main = NULL, labelSize = 7, pv
     theme(legend.title = element_blank()) +
     theme(legend.position = "top") +
 
-
     ggtitle(main) +
     theme(plot.title = element_text(lineheight=.8, face="bold", hjust = .5)) +
 
@@ -129,7 +163,7 @@ VolcanoPlot <- function(df, xlim=NULL, ylim=NULL, main = NULL, labelSize = 7, pv
     xlab(bquote(~Log[2]~ "fold change")) + ylab(bquote(~-Log[10]~italic(P))) +
 
     scale_colour_manual(values=c("Downregulated" = "darkgreen", "NS" = "gray", "Upregulated" = "red"),
-                        labels = c("Downregulated" = "Downregulated", "NotDE" = "NS", "Upregulated" = "Upregulated"),
+                        labels = c("Downregulated" = "Downregulated", "NS" = "NS", "Upregulated" = "Upregulated"),
                         drop = FALSE) + #Force legend to show always
 
     guides(shape=FALSE) # Remove legend for shapes
@@ -139,7 +173,7 @@ VolcanoPlot <- function(df, xlim=NULL, ylim=NULL, main = NULL, labelSize = 7, pv
 
 
 
-# VolcanoPlot <- function(df, xlim=NULL, ylim=NULL, main = NULL, labelSize = 7, pval = 0.1, log2FC = 1) {
+# VolcanoPlot <- function(df, xlim=NULL, ylim=NULL, main = NULL, labelSize = 8, pval = 0.05, log2FC = 1) {
 #   require(ggplot2)
 #   require(ggrastr)
 
@@ -180,7 +214,7 @@ VolcanoPlot <- function(df, xlim=NULL, ylim=NULL, main = NULL, labelSize = 7, pv
 #     xlab(bquote(~Log[2]~ "fold change")) + ylab(bquote(~-Log[10]~italic(P))) +
 
 #     scale_colour_manual(values=c("Downregulated" = "darkgreen", "NotDE" = "gray", "Upregulated" = "red"),
-#                         labels = c("Downregulated" = "Downregulated", "NotDE" = "NS", "Upregulated" = "Upregulated"),
+#                         labels = c("Downregulated" = "Downregulated", "NS" = "NS", "Upregulated" = "Upregulated"),
 #                         drop = FALSE) + #Force legend to show always
 
 #     scale_shape_manual(values=c("triangle_up" = "\u25B2", "triangle_right" = "\u25BA", "triangle_left" = "\u25C4", "circle" = "\u25CF",

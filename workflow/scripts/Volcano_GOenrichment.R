@@ -21,13 +21,13 @@ pval   <- as.numeric(snakemake@params[["pval"]])
 
 p <- VolcanoPlot(DEA.annot, 
                     xlim      = c(-8,8),
-                    ylim      = c(0,30),
+                    ylim      = c(0,18),
                     main      = gsub("-", " ", snakemake@params[["contrast"]]),
-                    labelSize = 7,
+                    labelSize = 8,
                     pval      = pval,
                     log2FC    = log2fc)
 
-pdf(snakemake@output[["volcano"]])
+pdf(snakemake@output[["volcano"]], width = 6, height = 6)
 p
 dev.off()
 

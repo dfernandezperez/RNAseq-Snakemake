@@ -5,18 +5,11 @@ sink(log, type = "message")
 library(dplyr)
 library(tibble)
 
-#------------------------- Functions to tpm and rpkm ------------------------------
-do_fpkm = function (counts, effective_lengths) {
-  exp(log(counts) - log(effective_lengths) - log(sum(counts)) + log(1E9))
-}
+source("workflow/scripts/custom_functions.R")
 
-do_tpm = function (counts, effective_lengths) {
-  rate = log(counts) - log(effective_lengths)
-  exp(rate - log(sum(exp(rate))) + log(1E6))
-}
-
-
-#------------------------- Preapre count table ------------------------------
+#------------------------------------------------------------------------------------------
+# Preapre count table
+#------------------------------------------------------------------------------------------
 read_files <- snakemake@input %>%
   purrr::map(read.delim, header = TRUE, skip = 1) %>%
   purrr::map(select, 1,6,7) %>% # Select geneid, length and counts
@@ -27,6 +20,7 @@ read_files <- snakemake@input %>%
 sample_names <- unlist(snakemake@input) %>%
   basename %>%
   gsub(pattern = ".featureCounts", replacement = "")
+
 
 # Create a df with raw counts, fpkm and tpm
 counts <- read_files %>%
@@ -45,7 +39,19 @@ tpm <- read_files %>%
   setNames(c("Geneid", sample_names)) 
 
 
-#------------------------- Write output ------------------------------
+#------------------------------------------------------------------------------------------
+# Remove excluded samples in case they are defined in config file
+#------------------------------------------------------------------------------------------
+if(!is.null(snakemake@params[["exclude"]])) {
+    counts <- counts %>% select(-snakemake@params[["exclude"]])
+    fpkm   <- fpkm %>% select(-snakemake@params[["exclude"]])
+    tpm    <- tpm %>% select(-snakemake@params[["exclude"]])
+}
+
+
+#------------------------------------------------------------------------------------------
+# Write output
+#------------------------------------------------------------------------------------------
 write.table(counts, snakemake@output[["raw_counts"]], sep = "\t", quote = F, row.names = FALSE)
 write.table(fpkm, snakemake@output[["fpkm"]], sep = "\t", quote = F, row.names = FALSE)
 write.table(tpm, snakemake@output[["tpm"]], sep = "\t", quote = F, row.names = FALSE)

@@ -5,6 +5,8 @@ rule create_tables:
         tpm         = "results/04deseq2/tpm.tsv",
         fpkm        = "results/04deseq2/fpkm.tsv",
         raw_counts  = "results/04deseq2/Raw_counts.tsv"
+    params:
+        exclude = config["diffexp"].get("exclude", None)
     log:
         "results/00log/deseq2/create_tables.log"
     script:
@@ -43,7 +45,7 @@ rule get_contrasts:
 
 rule pca:
     input:
-        rules.deseq2.output
+        rules.deseq2.output.rds
     output:
         "results/04deseq2/pca.pdf"
     params:

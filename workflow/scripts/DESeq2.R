@@ -7,12 +7,17 @@ library(DESeq2)
 library(dplyr)
 library(tibble)
 
-#------------------------- read count table ------------------------------
+
+#------------------------------------------------------------------------------------------
+# Read count table
+#------------------------------------------------------------------------------------------
 counts <- read.delim(snakemake@input[[1]], check.names = FALSE) %>%
     column_to_rownames("Geneid")
 
 
-#------------------------- DESeq2 workflow ------------------------------
+#------------------------------------------------------------------------------------------
+# DESeq2 workflow
+#------------------------------------------------------------------------------------------
 colData <- read.table(snakemake@params[["samples"]], header=TRUE)
 # Remove unwanted samples (outliers, for example)
 if(!is.null(snakemake@params[["exclude"]])) {
@@ -34,6 +39,9 @@ norm_counts <- counts(dds, normalized = T) %>%
                 round(3) %>% 
                 rownames_to_column(var = "Geneid")
 
-write.table(norm_counts, snakemake@output[["norm_counts"]], sep = "\t", quote = F, row.names = FALSE)
 
+#------------------------------------------------------------------------------------------
+# Save output
+#------------------------------------------------------------------------------------------
+write.table(norm_counts, snakemake@output[["norm_counts"]], sep = "\t", quote = F, row.names = FALSE)
 saveRDS(dds, file=snakemake@output[["rds"]])

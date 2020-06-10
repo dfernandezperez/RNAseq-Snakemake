@@ -85,7 +85,7 @@ use-singularity: true
 
 ## Execution of the pipeline
 
-Once you have all the configuration files as desired, it's time to execute the pipeline. For that you have to execute the `execute_pipeline.sh` script, followed by the name of the rule that you want to execute. If any rule is given it will automatically execute the rule `all` (which would execute the standard pipeline). Examples:
+Once you have all the configuration files as desired, it's time to execute the pipeline. For that you have to execute the `execute_pipeline.sh` script, followed by the name of the rule that you want to execute. If no rule is given it will automatically execute the rule `all` (which would execute the standard pipeline). Examples:
 
 ```bash
 ./execute_pipeline.sh all
@@ -97,13 +97,13 @@ is equivalent to
 ./execute_pipeline.sh
 ```
 
-If you don't want bigwig files and QC control...
+Other rules:
+
+* all_downsampled: execute the same pipeline but downsample the count matrix prior to DESeq2 based based on the sample with less counts. A seed is set in config.yaml to allow reproducibility.
 
 ```bash
-./execute_pipeline.sh all_noQC
+./execute_pipeline.sh all_downsampled
 ```
-
-At the end of the `Snakefile` you will find all the possible target rules and their corresponding output files.
 
 You can modify these rules and add new all rules to get just the files that you are interested in.
 
@@ -111,4 +111,3 @@ You can modify these rules and add new all rules to get just the files that you 
 ## To Do's
 
 * Migrate 100% to snakemake profiles and stop using the `cluster.yaml` configuration.
-* Add the option to downsample the count matrix based on the sample with less counts.
