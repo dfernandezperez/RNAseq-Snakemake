@@ -19,8 +19,8 @@ rule deseq2:
         rds         = "results/04deseq2/all.rds",
         norm_counts = "results/04deseq2/Normalized_counts.tsv",
     params:
-        samples = config["samples"],
-        exclude = config["diffexp"].get("exclude", None)
+        samples  = config["samples"],
+        exclude  = config["diffexp"].get("exclude", None),
     log:
         "results/00log/deseq2/init.log"
     script:
@@ -35,9 +35,13 @@ rule get_contrasts:
         ma_plot   = "results/04deseq2/{contrast}/{contrast}_ma-plot.pdf",
         pval_hist = "results/04deseq2/{contrast}/{contrast}_pval-hist.pdf",
     params:
-        contrast = lambda w: config["diffexp"]["contrasts"][w.contrast],
-        samples   = config["samples"],
-        exclude   = config["diffexp"].get("exclude", None)
+        contrast        = lambda w: config["diffexp"]["contrasts"][w.contrast],
+        samples         = config["samples"],
+        exclude         = config["diffexp"].get("exclude", None),
+        annot           = config["ref"]["geneInfo"].get("file", None),
+        column_used     = config["ref"]["geneInfo"]["column_used"],
+        column_toAdd    = config["ref"]["geneInfo"]["column_toAdd"],
+        name_annotation = config["ref"]["geneInfo"]["name_annotation"],
     log:
         "results/00log/deseq2/{contrast}.diffexp.log"
     script:
@@ -69,18 +73,32 @@ rule filter_deg:
     script:
         "../scripts/filter_deg.R"
 
-rule deg_analysis:
+rule enrichments:
     input:
         rules.filter_deg.output
     output:
         enrichments = "results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_enrichments_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.xls",
-        volcano	    = "results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_volcano_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.pdf",
+    params:
+        genome       = config["ref"]["genome"],
+        pvalue       = config["enrichments"]["pval"],
+        qvalue       = config["enrichments"]["qval"],
+        set_universe = config["enrichments"]["set_universe"],
+    log:
+        "results/00log/deseq2/{contrast}.log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.enrichments.log"
+    script:
+        "../scripts/enrichments.R"   
+
+
+rule volcano:
+    input:
+        rules.filter_deg.output
+    output:
+        volcano	 = "results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_volcano_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.pdf",
     params:
         pval     = lambda w: w.pvalue,
         log2fc   = lambda w: w.log2fc,
         contrast = lambda w: w.contrast,
-        genome   = config["ref"]["genome"],
     log:
-        "results/00log/deseq2/{contrast}.log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.deg_analysis.log"
+        "results/00log/deseq2/{contrast}.log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.volcano.log"
     script:
-        "../scripts/Volcano_GOenrichment.R"   
+        "../scripts/volcano.R"  

@@ -36,9 +36,13 @@ rule get_contrasts_downsampled:
         ma_plot   = "results/04deseq2/downsampled/{contrast}/{contrast}_ma-plot.pdf",
         pval_hist = "results/04deseq2/downsampled/{contrast}/{contrast}_pval-hist.pdf",
     params:
-        contrast = lambda w: config["diffexp"]["contrasts"][w.contrast],
-        samples   = config["samples"],
-        exclude   = config["diffexp"].get("exclude", None)
+        contrast        = lambda w: config["diffexp"]["contrasts"][w.contrast],
+        samples         = config["samples"],
+        exclude         = config["diffexp"].get("exclude", None),
+        annot           = config["ref"]["geneInfo"].get("file", None),
+        column_used     = config["ref"]["geneInfo"]["column_used"],
+        column_toAdd    = config["ref"]["geneInfo"]["column_toAdd"],
+        name_annotation = config["ref"]["geneInfo"]["name_annotation"],
     log:
         "results/00log/deseq2/downsampled/{contrast}.diffexp.log"
     script:
@@ -70,18 +74,32 @@ rule filter_deg_downsampled:
     script:
         "../scripts/filter_deg.R"
 
-rule deg_analysis_downsampled:
+rule enrichments_downsampled:
     input:
         rules.filter_deg_downsampled.output
     output:
         enrichments = "results/04deseq2/downsampled/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_enrichments_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.xls",
-        volcano	    = "results/04deseq2/downsampled/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_volcano_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.pdf",
+    params:
+        genome       = config["ref"]["genome"],
+        pvalue       = config["enrichments"]["pval"],
+        qvalue       = config["enrichments"]["qval"],
+        set_universe = config["enrichments"]["set_universe"],
+    log:
+        "results/00log/deseq2/downsampled/{contrast}.log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.enrichments.log"
+    script:
+        "../scripts/enrichments.R"   
+
+
+rule volcano_downsampled:
+    input:
+        rules.filter_deg_downsampled.output
+    output:
+        volcano	 = "results/04deseq2/downsampled/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_volcano_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.pdf",
     params:
         pval     = lambda w: w.pvalue,
         log2fc   = lambda w: w.log2fc,
         contrast = lambda w: w.contrast,
-        genome   = config["ref"]["genome"],
     log:
-        "results/00log/deseq2/downsampled/{contrast}.log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.deg_analysis.log"
+        "results/00log/deseq2/downsampled/{contrast}.log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.volcano.log"
     script:
-        "../scripts/Volcano_GOenrichment.R"   
+        "../scripts/volcano.R"  

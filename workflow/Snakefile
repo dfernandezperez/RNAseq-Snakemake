@@ -2,17 +2,16 @@ import pandas as pd
 import yaml
 from snakemake.utils import validate, min_version
 
-
-
 ##### set minimum snakemake version #####
-min_version("5.4.3")
+min_version("5.9.1")
 
-##### Singularity image path
+##### Singularity image path #####
 singularity: "/hpcnfs/data/DP/Singularity/rnaseq-snakemake.simg"
 
 ##### load config, cluster config and sample sheets #####
 configfile: "configuration/config.yaml"
 # validate(config, schema="schemas/config.schema.yaml")
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Load sample sheet and cluster configuration
@@ -31,6 +30,26 @@ SAMPLES = set(units["sample"])
 
 
 #-----------------------------------------------------------------------------------------------------------------------
+# Define optional output (based on config.yaml settings)
+#-----------------------------------------------------------------------------------------------------------------------
+if config["enrichments"]["do"]:
+    enrichments = expand("results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_enrichments_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.xls", 
+                    contrast = config["diffexp"]["contrasts"], 
+                    pvalue = config["diffexp"]["pvalue"], 
+                    log2fc = config["diffexp"]["log2fc"],
+                    fpkm   = config["diffexp"]["fpkm"])
+
+    enrichments_downsampled = expand("results/04deseq2/downsampled/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_enrichments_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.xls", 
+            contrast = config["diffexp"]["contrasts"], 
+            pvalue = config["diffexp"]["pvalue"], 
+            log2fc = config["diffexp"]["log2fc"],
+            fpkm   = config["diffexp"]["fpkm"])
+else:
+    enrichments = []
+    enrichments_downsampled = []
+
+
+#-----------------------------------------------------------------------------------------------------------------------
 # Define multiple outputs based on the output files desired
 #-----------------------------------------------------------------------------------------------------------------------
 rule all: 
@@ -38,34 +57,35 @@ rule all:
         "results/04deseq2/pca.pdf",
         "results/01qc/multiqc/multiqc_report.html",
         expand("results/05bigwig/{sample}.bw", sample = SAMPLES),
-        expand("results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_enrichments_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.xls", 
+        enrichments,
+        expand("results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_volcano_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.pdf", 
             contrast = config["diffexp"]["contrasts"], 
             pvalue = config["diffexp"]["pvalue"], 
             log2fc = config["diffexp"]["log2fc"],
-            fpkm   = config["diffexp"]["fpkm"]
-            )
+            fpkm   = config["diffexp"]["fpkm"])
 
 rule all_downsampled: 
     input:
         "results/04deseq2/downsampled/pca.pdf",
         "results/01qc/multiqc/multiqc_report.html",
         expand("results/05bigwig/{sample}.bw", sample = SAMPLES),
-        expand("results/04deseq2/downsampled/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_enrichments_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.xls", 
+        enrichments_downsampled,
+        expand("results/04deseq2/downsampled/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_volcano_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.pdf", 
             contrast = config["diffexp"]["contrasts"], 
             pvalue = config["diffexp"]["pvalue"], 
             log2fc = config["diffexp"]["log2fc"],
-            fpkm   = config["diffexp"]["fpkm"]
-            )
+            fpkm   = config["diffexp"]["fpkm"])
 
 rule all_downsampled_test: 
     input:
         "results/04deseq2/downsampled/pca.pdf",
-        expand("results/04deseq2/downsampled/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_enrichments_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.xls", 
+        enrichments_downsampled,
+        expand("results/04deseq2/downsampled/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_volcano_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.pdf", 
             contrast = config["diffexp"]["contrasts"], 
             pvalue = config["diffexp"]["pvalue"], 
             log2fc = config["diffexp"]["log2fc"],
-            fpkm   = config["diffexp"]["fpkm"]
-            )
+            fpkm   = config["diffexp"]["fpkm"])
+
 
 ##### load rules #####
 include: "rules/common.smk"
@@ -81,13 +101,13 @@ localrules: all, all_downsampled, cp_fastq_pe, cp_fastq_se
 ##### handle possible errors, clean temp folders #####
 onsuccess:
     shell("""
-    rm -r fastq/
-    qselect -u `whoami` -s E | xargs qdel -Wforce
+    rm -r results/fastq/
+    qselect -u `whoami` -s E | xargs qdel -Wforce # Remove potential jobs in E state
     """)
 
 onerror:
     print("An error ocurred. Workflow aborted")
     shell("""
-    qselect -u `whoami` -s E | xargs qdel -Wforce
+    qselect -u `whoami` -s E | xargs qdel -Wforce # Remove potential jobs in E state
         mail -s "An error occurred. RNA-seq snakemake workflow aborted" `whoami`@ieo.it < {log}
         """)

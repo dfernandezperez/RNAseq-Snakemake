@@ -38,6 +38,19 @@ ref:
   index: /hpcnfs/data/DP/Databases/STAR_GRCm38
   # gtf file with transcripts
   annotation: /hpcnfs/data/DP/Databases/STAR_GRCm38/gencode.vM21.annotation.gtf
+  # This will be used to add different annotations to the DEGs table.
+  # i.e: ensembl, entrez, ucsc... 
+  geneInfo: 
+    # path to geneInfo.tab file from STAR
+    # leave it blank if there's no file or you don' want to perform this
+    file: /hpcnfs/data/DP/Databases/STAR_GRCm38/geneInfo.tab
+    # Define the position of the column used for the annotation and the column to add.
+    # So, if we used geneSymbol as annotation (2nd column) and we want ENSEMBL (first)
+    # Write 2 in used and 1 in toAdd
+    column_used: 2
+    column_toAdd: 1
+    # Name of the annotation to add (ENSEMBL, SYMBOL, ENTREZID...)
+    name_annotation: "ENSEMBL"
 
 
 pca:
@@ -72,6 +85,21 @@ diffexp:
       - CTR_NT
 
       
+enrichments:
+  # Perform or not enrichment analysis. True or False.
+  do: True
+  # Use background genes as universe in enrichment analyses. This SHOULD be
+  # always used as it will give the most correct p-values. However, to be able to
+  # still reproduce the results of the previous version of the pipeline we'll keep
+  # this option. In the future this will be mandatory and the option will be removed.
+  # set TRUE or FALSE in capital letters (it will be read by R).
+  set_universe: TRUE
+  # Adjusted p-value and q-value thresholds for enrichment analysis with 
+  # clusterProfiler
+  pval: 0.05
+  qval: 0.1
+
+
 # Parameters for some of the programs used in the pipeline
 params:
   # Memory used by every core of samtools (GB). Be careful that
@@ -80,6 +108,8 @@ params:
   star: "--outSAMattributes Standard \
         --outFilterMultimapNmax 1 \
         --readFilesCommand zcat"
+  # By now the column used by featureCounts MUST contain the SYMBOL annotation since it's the one
+  # used to transform gene names to ENTREZID for the enrichment analysis
   featureCounts: "-s 0 -t exon -g gene_name"
   # In case trimming is set to true, define trimmining parameters
   fastp-se: "--stdin -t 1 -A -Q -L"

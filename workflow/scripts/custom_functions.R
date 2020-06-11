@@ -1,17 +1,6 @@
 #----------------------------------------------------------------------------------------------
-# Filtering and annotation of DE tables
+# Annotation of differential expression table
 #----------------------------------------------------------------------------------------------
-#Function to round all numeric colums of dataframe
-round_df <- function(df, digits) {
-  nums <- vapply(df, is.numeric, FUN.VALUE = logical(1))
-  
-  df[,nums] <- round(df[,nums], digits = digits)
-  
-  (df)
-}
-
-
-# Annot DE table. Useful to filter the excel file or to do a volcano plot coloring the DE and non DE genes
 Annot_DE <- function(df, log2FC = 2, padjust = 0.05, fpkm = 0) {
   require(dplyr)
   require(purrr)
@@ -62,40 +51,60 @@ function (expr_mat)
 #----------------------------------------------------------------------------------------------
 # Enrichment analyses functions
 #----------------------------------------------------------------------------------------------
-goEnrichment <- function(df, ont = "BP", db = org.Mm.eg.db) {
+goEnrichment <- function(
+  df, 
+  ont      = "BP", 
+  db       = org.Mm.eg.db, 
+  pvalue   = 0.05, 
+  qvalue   = 0.1,
+  universe = NULL
+  ) {
   require(clusterProfiler)
-  require(db)
-  ego <- enrichGO(gene          = df$ENTREZID,
+    ego <- enrichGO(gene          = df$ENTREZID,
                   OrgDb         = db,
                   keyType       = 'ENTREZID',
                   ont           = ont,
                   pAdjustMethod = "BH",
-                  pvalueCutoff  = 0.05,
-                  qvalueCutoff  = 0.1,
-                  readable = TRUE)
+                  pvalueCutoff  = pvalue,
+                  qvalueCutoff  = qvalue,
+                  universe      = universe,
+                  readable      = TRUE)
   return(ego)
 }
 
-KEGGenrichment <- function(df, org = "mmu", db = org.Mm.eg.db) {
+KEGGenrichment <- function(
+  df, 
+  org      = "mmu", 
+  db       = org.Mm.eg.db, 
+  pvalue   = 0.05, 
+  qvalue   = 0.1,
+  universe = NULL
+  ) {
   require(clusterProfiler)
-  require(db)
   ekgg <- enrichKEGG(gene          = df$ENTREZID,
                      organism      = org,
                      pAdjustMethod = "BH",
-                     pvalueCutoff  = 0.05,
-                     qvalueCutoff  = 0.1)
+                     pvalueCutoff  = pvalue,
+                     qvalueCutoff  = qvalue,
+                     universe      = universe)
   ekgg <- DOSE::setReadable(ekgg, OrgDb = db, keyType="ENTREZID")
   return(ekgg)
 }
 
-
-PAenrichment <- function(df, org = "mouse") {
+PAenrichment <- function(
+  df, 
+  org      = "mouse", 
+  pvalue   = 0.05, 
+  qvalue   = 0.1,
+  universe = NULL
+  ) {
   require(clusterProfiler)
   require(ReactomePA)
   ePA <- enrichPathway(gene         = df$ENTREZID,
-                       pvalueCutoff = 0.05,
-                       qvalueCutoff = 0.1,
+                       pvalueCutoff = pvalue,
+                       qvalueCutoff = qvalue,
                        organism     = org,
+                       universe     = universe,
                        readable     = TRUE)
   return(ePA)
 }
@@ -104,7 +113,7 @@ GSEA_enrichment <- function(df, pathways.gmt) {
   require(clusterProfiler)
   pathways <- fgsea::gmtPathways(pathways.gmt)
   
-  # Create a list containing a named vector (with genenames) of log2fc of each PcgfsKO vs WT
+  # Create a list containing a named vector (with genenames) of log2fc
   geneList <- df$log2FoldChange
   names(geneList) <- toupper(df$Geneid)
   
@@ -120,10 +129,11 @@ GSEA_enrichment <- function(df, pathways.gmt) {
 
 
 #----------------------------------------------------------------------------------------------
-# Plots
+# Volcano plot code
 #----------------------------------------------------------------------------------------------
 VolcanoPlot <- function(df, xlim=NULL, ylim=NULL, main = NULL, labelSize = 8, pval = 0.05, log2FC = 1) {
   require(ggplot2)
+  require(dplyr)
   # require(ggrastr)
 
   df <- mutate(df, shape = "circle")
