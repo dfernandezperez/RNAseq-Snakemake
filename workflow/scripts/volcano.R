@@ -28,4 +28,5 @@ p <- VolcanoPlot(df,
                     pval      = pval,
                     log2FC    = log2fc)
 
-ggsave(snakemake@output[["volcano"]], p, width = 6, height = 6)
+ggsave(snakemake@output[["volcano_pdf"]], p, width = 6, height = 6)
+ggsave(snakemake@output[["volcano_png"]], p, width = 6, height = 6)

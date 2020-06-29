@@ -31,15 +31,14 @@ res <- results(dds, name = contrast, filterFun = ihw, alpha = 0.05)
 
 
 #------------------------------------------------------------------------------------------
-# Shrink fold changes with apeglm method of DESeq2
+# Shrink fold changes with apeglm method of DESeq2 if it was set in config file.
 #------------------------------------------------------------------------------------------
-# https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/bty895/5159452
-res <- lfcShrink(dds = dds, coef = contrast, res = res, type = "apeglm")
+do_lfcShrink <- as.logical(snakemake@params[["lfcShrink"]])
 
-# Transform results to dataframe object
-res.df <- as.data.frame(res) %>%
-            rownames_to_column(var = "Geneid")
-
+if (do_lfcShrink == TRUE) {
+  # https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/bty895/5159452
+  res <- lfcShrink(dds = dds, coef = contrast, res = res, type = "apeglm")
+}
 
 #-----------------------------------------------------------------------------
 # Read fpkm table and calculate the average of replicates
@@ -70,7 +69,8 @@ fpkm_table <- fpkm %>%
 #------------------------------------------------------------------------------------------
 # Tidy output: Merge FPKM data, sort by p-value, Geneid to column, round to 2 deciamls
 #------------------------------------------------------------------------------------------
-res.tidy <- res.df %>%
+res.tidy <- as.data.frame(res) %>%
+  rownames_to_column(var = "Geneid") %>%
   left_join(fpkm_table) %>%
   arrange(padj) %>%
   mutate_at(vars(-Geneid, -pvalue, -padj), list(~ round(., 2))) %>%

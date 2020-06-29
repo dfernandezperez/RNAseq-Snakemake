@@ -38,7 +38,7 @@ counts <- snakemake@input %>%
 # Remove excluded samples in case they are defined in config file prior to downsample
 #------------------------------------------------------------------------------------------
 if(!is.null(snakemake@params[["exclude"]])) {
-    counts <- counts %>% select(-snakemake@params[["exclude"]])
+    counts <- counts %>% select(-one_of(snakemake@params[["exclude"]]))
 }
 
 

@@ -36,6 +36,7 @@ rule get_contrasts:
         pval_hist = "results/04deseq2/{contrast}/{contrast}_pval-hist.pdf",
     params:
         contrast        = lambda w: config["diffexp"]["contrasts"][w.contrast],
+        lfcShrink       = config["lfcShrink"],
         samples         = config["samples"],
         exclude         = config["diffexp"].get("exclude", None),
         annot           = config["ref"]["geneInfo"].get("file", None),
@@ -93,7 +94,8 @@ rule volcano:
     input:
         rules.filter_deg.output
     output:
-        volcano	 = "results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_volcano_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.pdf",
+        volcano_pdf	 = "results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_volcano_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.pdf",
+        volcano_png	 = "results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_volcano_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.png",
     params:
         pval     = lambda w: w.pvalue,
         log2fc   = lambda w: w.log2fc,

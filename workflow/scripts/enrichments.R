@@ -83,12 +83,12 @@ GSEA.c3tft <- GSEA_enrichment(DEA.annot, "resources/c3.tft.v6.2.symbols.gmt")
 #------------------------------------------------------------------------------------------
 # save outputs to xls
 #------------------------------------------------------------------------------------------
-list_of_datasets <- list( "GO Upregulated"        = UP.go@result %>% dplyr::filter(p.adjust < pvalue) %>% add_row(), 
-                          "GO Downregulated"      = DWN.go@result %>% dplyr::filter(p.adjust < pvalue) %>% add_row(),
-                          "KEGG Upregulated"      = UP.kegg@result %>% dplyr::filter(p.adjust < pvalue) %>% add_row(),
-                          "KEGG Downregulated"    = DWN.kegg@result %>% dplyr::filter(p.adjust < pvalue) %>% add_row(),
-                          "Reactome Upregulated"  = UP.pa@result %>% dplyr::filter(p.adjust < pvalue) %>% add_row(),
-                          "Reactome Downregulaed" = DWN.pa@result %>% dplyr::filter(p.adjust < pvalue) %>% add_row(),
+list_of_datasets <- list( "GO Upregulated"        = UP.go@result %>% dplyr::filter(p.adjust < !!pvalue) %>% add_row(), 
+                          "GO Downregulated"      = DWN.go@result %>% dplyr::filter(p.adjust < !!pvalue) %>% add_row(),
+                          "KEGG Upregulated"      = UP.kegg@result %>% dplyr::filter(p.adjust < !!pvalue) %>% add_row(),
+                          "KEGG Downregulated"    = DWN.kegg@result %>% dplyr::filter(p.adjust < !!pvalue) %>% add_row(),
+                          "Reactome Upregulated"  = UP.pa@result %>% dplyr::filter(p.adjust < !!pvalue) %>% add_row(),
+                          "Reactome Downregulaed" = DWN.pa@result %>% dplyr::filter(p.adjust < !!pvalue) %>% add_row(),
                           "GSEA Hallmarks"        = GSEA.hall %>% dplyr::filter(padj < 0.25) %>% dplyr::select(-c(leadingEdge,nMoreExtreme)) %>% arrange(pval) %>% add_row(),
                           "GSEA c2all"            = GSEA.c2all %>% dplyr::filter(padj < 0.25) %>% dplyr::select(-c(leadingEdge,nMoreExtreme)) %>% arrange(pval) %>% add_row(),
                           "GSEA c3tft"            = GSEA.c3tft %>% dplyr::filter(padj < 0.25) %>% dplyr::select(-c(leadingEdge,nMoreExtreme)) %>% arrange(pval) %>% add_row())

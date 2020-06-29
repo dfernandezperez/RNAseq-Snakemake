@@ -134,7 +134,7 @@ GSEA_enrichment <- function(df, pathways.gmt) {
 VolcanoPlot <- function(df, xlim=NULL, ylim=NULL, main = NULL, labelSize = 8, pval = 0.05, log2FC = 1) {
   require(ggplot2)
   require(dplyr)
-  # require(ggrastr)
+  require(ggrastr)
 
   df <- mutate(df, shape = "circle")
 
@@ -150,8 +150,8 @@ VolcanoPlot <- function(df, xlim=NULL, ylim=NULL, main = NULL, labelSize = 8, pv
 
   p <-  ggplot(data = na.omit(df), aes(x=log2FoldChange, y=-log10(padj), colour=DEG, shape=shape) ) +
 
-    # geom_point_rast(alpha=0.7, size=1.7, raster.height = 5.15, raster.width = 6, raster.dpi = 400) +
-    geom_point(alpha=0.7, size=1.7) +
+    geom_point_rast(alpha=0.7, size=1.7, raster.height = 5.15, raster.width = 6, raster.dpi = 400) +
+    # geom_point(alpha=0.7, size=1.7) +
 
     annotate("text", label = sum(df$DEG == "Upregulated"), color = "red", y = 0, x = xlim[2],
              vjust="inward",hjust="inward", size = labelSize) +

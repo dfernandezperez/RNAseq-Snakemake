@@ -43,9 +43,9 @@ tpm <- read_files %>%
 # Remove excluded samples in case they are defined in config file
 #------------------------------------------------------------------------------------------
 if(!is.null(snakemake@params[["exclude"]])) {
-    counts <- counts %>% select(-snakemake@params[["exclude"]])
-    fpkm   <- fpkm %>% select(-snakemake@params[["exclude"]])
-    tpm    <- tpm %>% select(-snakemake@params[["exclude"]])
+    counts <- counts %>% select(-one_of(snakemake@params[["exclude"]]))
+    fpkm   <- fpkm %>% select(-one_of(snakemake@params[["exclude"]]))
+    tpm    <- tpm %>% select(-one_of(snakemake@params[["exclude"]]))
 }
 
 

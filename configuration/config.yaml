@@ -26,6 +26,11 @@ tmp: /hpcnfs/scratch/temporary/.snakemake/rnaseq
 # to set desired trimming parameters
 trimming: false
 
+# perform lfcshrink: FALSE or TRUE
+# Set in capital letters since it will be read by R
+# if true it will correct log2fc's using
+# the apeglm method from DESeq2
+lfcShrink: TRUE
 
 # Set seed for downsampling
 seed: 1234
