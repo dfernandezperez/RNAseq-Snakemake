@@ -6,7 +6,7 @@ from snakemake.utils import validate, min_version
 min_version("5.9.1")
 
 ##### Singularity image path #####
-singularity: "/hpcnfs/data/DP/Singularity/rnaseq-snakemake.simg"
+singularity: "/hpcnfs/data/DP/Singularity/rnaseq-snakemake_120620.sif"
 
 ##### load config, cluster config and sample sheets #####
 configfile: "configuration/config.yaml"
