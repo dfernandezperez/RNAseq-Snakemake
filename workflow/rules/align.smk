@@ -1,3 +1,4 @@
+# Most star parameters taken from https://www.biorxiv.org/content/biorxiv/early/2019/10/31/657874.full.pdf
 rule star:
     input:
         get_fq
@@ -24,15 +25,46 @@ rule star:
         --runThreadN {threads} \
         --readFilesIn {input} \
         --outFileNamePrefix {params.out_dir} \
-        --outSAMtype SAM \
+        --outSAMtype SAM Unsorted \
         --outStd SAM \
+        --quantMode TranscriptomeSAM \
+        --outSAMunmapped Within \
+        --quantTranscriptomeBan Singleend \
+        --outFilterType BySJout \
+        --alignSJoverhangMin 8 \
+        --outFilterMultimapNmax 20 \
+        --alignSJDBoverhangMin 1 \
+        --outFilterMismatchNmax 999 \
+        --outFilterMismatchNoverReadLmax 0.04 \
+        --alignIntronMin 20 \
+        --alignIntronMax 1000000 \
+        --alignMatesGapMax 1000000 \
         {params.star_params} 2> {log.align} \
         | samblaster --removeDups 2> {log.rm_dups} \
-        | samtools view -Sb -F 4 - \
-        | samtools sort -m {params.samtools_mem}G -@ {threads} -T {output.bam}.tmp -o {output.bam} - 2>> {log.align}
+        | samtools view -Sb - \
+        | > {output.bam} 2>> {log.align}
         samtools index {output.bam} 2>> {log.align}
         """
 
+# CONTINUE FROM HERE!!
+rule salmon_quant:
+    input:
+        rules.star.output.bam
+    output:
+    log:
+    params:
+        transcriptome = ,
+    threads:
+    shell:
+        """
+        salmon quant \
+        -t {params.transcriptome} \
+        -l A \
+        --validateMappings \
+        --gcBias \
+        -a {input} \
+        -o {output}
+        """
 
 rule featureCounts:
     input:
