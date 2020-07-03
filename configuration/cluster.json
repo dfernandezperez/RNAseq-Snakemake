@@ -26,9 +26,11 @@
 		"cpu" : 8,
 		"MaxMem" : 40
 	},
-	"featureCounts":
+	"salmonQuant":
 	{
-		"cpu" : 5
+		"cpu" : 8,
+		"MaxMem" : 20
+
 	},
 	"deseq2":
 	{

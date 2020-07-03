@@ -40,15 +40,16 @@ ref:
   # Select the genome of the organism, needed to perform GO analyses. Supported: mouse, human.
   genome: "mouse"
   # the STAR index
-  index: /hpcnfs/data/DP/Databases/STAR_GRCm38
+  index: /hpcnfs/data/DP/STAR_INDEXES/v2.7.5a/GRCm38
   # gtf file with transcripts
-  annotation: /hpcnfs/data/DP/Databases/STAR_GRCm38/gencode.vM21.annotation.gtf
+  annotation: /hpcnfs/data/DP/STAR_INDEXES/v2.7.5a/GRCm38/gencode.vM21.annotation.gtf
+  transcriptome:  /hpcnfs/data/DP/STAR_INDEXES/v2.7.5a/GRCm38/gencode.vM21.transcripts.fa
   # This will be used to add different annotations to the DEGs table.
   # i.e: ensembl, entrez, ucsc... 
   geneInfo: 
     # path to geneInfo.tab file from STAR
     # leave it blank if there's no file or you don' want to perform this
-    file: /hpcnfs/data/DP/Databases/STAR_GRCm38/geneInfo.tab
+    file: /hpcnfs/data/DP/STAR_INDEXES/v2.7.5a/GRCm38/geneInfo.tab
     # Define the position of the column used for the annotation and the column to add.
     # So, if we used geneSymbol as annotation (2nd column) and we want ENSEMBL (first)
     # Write 2 in used and 1 in toAdd
@@ -110,12 +111,10 @@ params:
   # Memory used by every core of samtools (GB). Be careful that
   # memory x threads is not bigger than the amount of memory assigned to align rule
   samtools_mem: 3
-  star: "--outSAMattributes Standard \
-        --outFilterMultimapNmax 1 \
-        --readFilesCommand zcat"
+  star: "--readFilesCommand zcat"
   # By now the column used by featureCounts MUST contain the SYMBOL annotation since it's the one
   # used to transform gene names to ENTREZID for the enrichment analysis
-  featureCounts: "-s 0 -t exon -g gene_name"
+  salmon: "--gencode"
   # In case trimming is set to true, define trimmining parameters
   fastp-se: "--stdin -t 1 -A -Q -L"
   fastp-pe: "-t 1 -A -Q -L"
