@@ -4,7 +4,6 @@ rule star:
         get_fq
     output:
         bam   = "results/02alignments/{sample}/{sample}.bam",
-        index = "results/02alignments/{sample}/{sample}.bam.bai",
         log   = "results/02alignments/{sample}/Log.final.out"
     log:
         align   = "results/00log/alignments/{sample}.log",
@@ -25,8 +24,8 @@ rule star:
         --runThreadN {threads} \
         --readFilesIn {input} \
         --outFileNamePrefix {params.out_dir} \
-        --outSAMtype SAM \
-        --outStd SAM \
+        --outSAMtype None \
+        --outStd Log \
         --quantMode TranscriptomeSAM \
         --outSAMunmapped Within \
         --quantTranscriptomeBan Singleend \
@@ -39,11 +38,11 @@ rule star:
         --alignIntronMin 20 \
         --alignIntronMax 1000000 \
         --alignMatesGapMax 1000000 \
-        {params.star_params} 2> {log.align} \
+        {params.star_params} > {log.align}
+
+        samtools view -h {params.out_dir}Aligned.toTranscriptome.out.bam \
         | samblaster --removeDups 2> {log.rm_dups} \
-        | samtools view -Sb - \
-        | > {output.bam} 2>> {log.align}
-        samtools index {output.bam} 2>> {log.align}
+        | samtools view -Sb - > {output.bam} 2>> {log.align}
         """
 
 rule salmon_quant:
