@@ -6,7 +6,7 @@ from snakemake.utils import validate, min_version
 min_version("5.9.1")
 
 ##### Singularity image path #####
-singularity: "/hpcnfs/data/DP/Singularity/rnaseq-snakemake_010720.sif"
+singularity: "/hpcnfs/data/DP/Singularity/rnaseq-snakemake_090720.sif"
 
 ##### load config, cluster config and sample sheets #####
 configfile: "configuration/config.yaml"
@@ -54,7 +54,14 @@ else:
 #-----------------------------------------------------------------------------------------------------------------------
 rule all: 
     input:
-        expand("results/03salmonQuant/{sample}/quant.sf", sample = SAMPLES)
+        "results/04deseq2/all.rds", 
+        "results/04deseq2/pca.pdf",
+        "results/04deseq2/tpm.tsv",
+        expand("results/04deseq2/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_volcano_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.pdf", 
+            contrast = config["diffexp"]["contrasts"], 
+            pvalue = config["diffexp"]["pvalue"], 
+            log2fc = config["diffexp"]["log2fc"],
+            fpkm   = config["diffexp"]["fpkm"])
 
 rule all_downsampled: 
     input:

@@ -21,14 +21,12 @@ set.seed(snakemake@params[["seed"]])
 #------------------------------------------------------------------------------------------
 # Preapre count table
 #------------------------------------------------------------------------------------------
-sample_names <- unlist(snakemake@input) %>%
-  basename %>%
-  gsub(pattern = ".featureCounts", replacement = "")
+sample_names <- as.character(snakemake@params[["sample_names"]])
 
 # Merge all samples keeping geneid and length columns to calculate fpkm/tpm
 counts <- snakemake@input %>%
   purrr::map(read.delim, header = TRUE, skip = 1) %>% # Ignore first line of featureCounts output
-  purrr::map(select, 1,6,7) %>% # Select geneid, length and counts
+  purrr::map(select, 1,3,5) %>% # Select geneid, length and counts
   purrr::map(setNames, c("Geneid", "Length", "Counts"))  %>%
   plyr::join_all(type='inner', by = c("Geneid", "Length")) %>%
   setNames(c("Geneid", "Length", sample_names))

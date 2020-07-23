@@ -12,15 +12,12 @@ source("workflow/scripts/custom_functions.R")
 #------------------------------------------------------------------------------------------
 read_files <- snakemake@input %>%
   purrr::map(read.delim, header = TRUE, skip = 1) %>%
-  purrr::map(select, 1,6,7) %>% # Select geneid, length and counts
+  purrr::map(select, 1,3,5) %>% # Select geneid, length and counts
   purrr::map(setNames, c("Geneid", "Length", "Counts")) %>%
   purrr::map(~ mutate(.x, fpkm = do_fpkm(Counts,Length))) %>%
   purrr::map(~ mutate(.x, tpm  = do_tpm(Counts,Length)))
   
-sample_names <- unlist(snakemake@input) %>%
-  basename %>%
-  gsub(pattern = ".featureCounts", replacement = "")
-
+sample_names <- as.character(snakemake@params[["sample_names"]])
 
 # Create a df with raw counts, fpkm and tpm
 counts <- read_files %>%

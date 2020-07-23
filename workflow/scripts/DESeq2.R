@@ -6,13 +6,19 @@ sink(log, type = "message")
 library(DESeq2)
 library(dplyr)
 library(tibble)
-
+library(GenomicFeatures)
+library(tximport)
 
 #------------------------------------------------------------------------------------------
-# Read count table
+# Read abundances from salmon and create tx2gene
 #------------------------------------------------------------------------------------------
-counts <- read.delim(snakemake@input[[1]], check.names = FALSE) %>%
-    column_to_rownames("Geneid")
+files        <- unlist(snakemake@input)
+
+names(files) <- as.character(snakemake@params[["sample_names"]])
+
+txdb    <- makeTxDbFromGFF(file=snakemake@params[["tx2gene"]])
+k       <- keys(txdb, keytype = "TXNAME")
+tx2gene <- select(txdb, k, "GENEID", "TXNAME")
 
 
 #------------------------------------------------------------------------------------------
@@ -21,23 +27,34 @@ counts <- read.delim(snakemake@input[[1]], check.names = FALSE) %>%
 colData <- read.table(snakemake@params[["samples"]], header=TRUE)
 # Remove unwanted samples (outliers, for example)
 if(!is.null(snakemake@params[["exclude"]])) {
-    colData <- colData %>% filter( !sample %in% snakemake@params[["exclude"]] )
+    colData <- colData %>% dplyr::filter( !sample %in% snakemake@params[["exclude"]] )
 }
 
-# Counts and colData must have the same order and samples
-counts_ordered <- counts[as.character(colData$sample)]
-stopifnot(identical(colnames(counts_ordered), as.character(colData$sample)))
+# Filter samples that must be excluded from the list of quant.sf files.
+# Also force the same order of samples in colData and quant.sf
+files <- files[as.character(colData$sample)]
+stopifnot(identical(names(files), as.character(colData$sample)))
 
+# txi <- tximport(files, type = "salmon", tx2gene = tx2gene) # Load salmon quant files
 
-dds <- DESeqDataSetFromMatrix(countData = counts_ordered,
-                              colData   = colData,
-                              design    = ~ condition)
+# dds <- DESeqDataSetFromTximport(txi     = txi,
+#                                 colData = colData,
+#                                 design  = ~ condition)
+
+txi <- tximport(files, type = "salmon", tx2gene = tx2gene, countsFromAbundance = "scaledTPM") # Load salmon quant files
+
+dds <- DESeqDataSetFromMatrix(countData   = round(txi$counts),
+                                colData   = colData,
+                                design    = ~ condition)
+
 dds <- DESeq(dds)
 
+
+Geneid <- as.character(snakemake@params[["annot_col"]])
 norm_counts <- counts(dds, normalized = T) %>% 
                 data.frame %>% 
                 round(3) %>% 
-                rownames_to_column(var = "Geneid")
+                rownames_to_column(var = Geneid)
 
 
 #------------------------------------------------------------------------------------------

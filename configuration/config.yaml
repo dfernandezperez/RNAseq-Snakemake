@@ -44,6 +44,10 @@ ref:
   # gtf file with transcripts
   annotation: /hpcnfs/data/DP/STAR_INDEXES/v2.7.5a/GRCm38/gencode.vM21.annotation.gtf
   transcriptome:  /hpcnfs/data/DP/STAR_INDEXES/v2.7.5a/GRCm38/gencode.vM21.transcripts.fa
+  # Name of the annotation (ensembl, symbol, entrez...) it will be the column name of the genes
+  # It will also be the column used for the conversion of gene-to-entrez for clusterProfiler.
+  # The name has to be compatible with org.Mm.eg.db or org.Hg.eg.db
+  annot_type: "ENSEMBL"
   # This will be used to add different annotations to the DEGs table.
   # i.e: ensembl, entrez, ucsc... 
   geneInfo: 
@@ -53,10 +57,13 @@ ref:
     # Define the position of the column used for the annotation and the column to add.
     # So, if we used geneSymbol as annotation (2nd column) and we want ENSEMBL (first)
     # Write 2 in used and 1 in toAdd
-    column_used: 2
-    column_toAdd: 1
+    column_used: 1
+    column_toAdd: 2
     # Name of the annotation to add (ENSEMBL, SYMBOL, ENTREZID...)
-    name_annotation: "ENSEMBL"
+    # The name has to be compatible with org.Mm.eg.db or org.Hg.eg.db
+    name_annotation: "SYMBOL"
+    # Columns to skip in case the file has a wired header (like in the case of genInfo.tab from STAR)
+    skip: 1
 
 
 pca:

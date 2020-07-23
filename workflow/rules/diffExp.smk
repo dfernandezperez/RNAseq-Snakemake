@@ -1,12 +1,13 @@
 rule create_tables:
     input:
-        expand("results/03featureCounts/{sample}/{sample}.featureCounts", sample = SAMPLES)
+        expand("results/03salmonQuant/{sample}/quant.genes.sf", sample = SAMPLES)
     output:
         tpm         = "results/04deseq2/tpm.tsv",
         fpkm        = "results/04deseq2/fpkm.tsv",
         raw_counts  = "results/04deseq2/Raw_counts.tsv"
     params:
-        exclude = config["diffexp"].get("exclude", None)
+        sample_names = expand("{sample}", sample = SAMPLES),
+        exclude      = config["diffexp"].get("exclude", None),
     log:
         "results/00log/deseq2/create_tables.log"
     script:
@@ -14,13 +15,16 @@ rule create_tables:
  
 rule deseq2:
     input:
-        rules.create_tables.output.raw_counts
+        expand("results/03salmonQuant/{sample}/quant.sf", sample = SAMPLES)
     output:
         rds         = "results/04deseq2/all.rds",
         norm_counts = "results/04deseq2/Normalized_counts.tsv",
     params:
-        samples  = config["samples"],
-        exclude  = config["diffexp"].get("exclude", None),
+        sample_names = expand("{sample}", sample = SAMPLES),
+        samples      = config["samples"],
+        exclude      = config["diffexp"].get("exclude", None),
+        tx2gene      = config["ref"]["annotation"],
+        annot_col    = config["ref"]["annot_type"]
     log:
         "results/00log/deseq2/init.log"
     script:
@@ -40,6 +44,7 @@ rule get_contrasts:
         samples         = config["samples"],
         exclude         = config["diffexp"].get("exclude", None),
         annot           = config["ref"]["geneInfo"].get("file", None),
+        skip            = config["ref"]["geneInfo"]["skip"],
         column_used     = config["ref"]["geneInfo"]["column_used"],
         column_toAdd    = config["ref"]["geneInfo"]["column_toAdd"],
         name_annotation = config["ref"]["geneInfo"]["name_annotation"],
@@ -52,7 +57,10 @@ rule pca:
     input:
         rules.deseq2.output.rds
     output:
-        "results/04deseq2/pca.pdf"
+        pca_elipse_legend = "results/04deseq2/pca_elipse_legend.pdf",
+        pca_elipse        = "results/04deseq2/pca_elipse.pdf",
+        pca               = "results/04deseq2/pca.pdf",
+        pca_labeled       = "results/04deseq2/pca_labeled.pdf"
     params:
         pca_labels = config["pca"]["labels"]
     log:

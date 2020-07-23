@@ -1,11 +1,12 @@
 rule create_tables_downsampled:
     input:
-        expand("results/03featureCounts/{sample}/{sample}.featureCounts", sample = SAMPLES)
+        expand("results/03salmonQuant/{sample}/quant.genes.sf", sample = SAMPLES)
     output:
         tpm         = "results/04deseq2/downsampled/tpm.tsv",
         fpkm        = "results/04deseq2/downsampled/fpkm.tsv",
         raw_counts  = "results/04deseq2/downsampled/Raw_counts.tsv"
     params:
+        sample_names = expand("{sample}", sample = SAMPLES),
         exclude = config["diffexp"].get("exclude", None),
         seed    = config["seed"]
     log:
@@ -41,6 +42,7 @@ rule get_contrasts_downsampled:
         samples         = config["samples"],
         exclude         = config["diffexp"].get("exclude", None),
         annot           = config["ref"]["geneInfo"].get("file", None),
+        skip            = config["ref"]["geneInfo"]["skip"],
         column_used     = config["ref"]["geneInfo"]["column_used"],
         column_toAdd    = config["ref"]["geneInfo"]["column_toAdd"],
         name_annotation = config["ref"]["geneInfo"]["name_annotation"],
@@ -53,7 +55,10 @@ rule pca_downsampled:
     input:
         rules.deseq2_downsampled.output.rds
     output:
-        "results/04deseq2/downsampled/pca.pdf"
+        pca_elipse_legend = "results/04deseq2/downsampled/pca_elipse_legend.pdf",
+        pca_elipse        = "results/04deseq2/downsampled/pca_elipse.pdf",
+        pca               = "results/04deseq2/downsampled/pca.pdf",
+        pca_labeled       = "results/04deseq2/downsampled/pca_labeled.pdf"
     params:
         pca_labels = config["pca"]["labels"]
     log:

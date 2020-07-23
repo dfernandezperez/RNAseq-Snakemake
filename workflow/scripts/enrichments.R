@@ -13,44 +13,51 @@ source("workflow/scripts/custom_functions.R")
 #------------------------------------------------------------------------------------------
 # Read files and parameters
 #------------------------------------------------------------------------------------------
-DEA.annot <- read.delim(snakemake@input[[1]])
+DEA.annot <- read.delim(snakemake@input[[1]]) 
 
 genome       <- snakemake@params[["genome"]]
 pvalue       <- as.numeric(snakemake@params[["pvalue"]])
 qvalue       <- as.numeric(snakemake@params[["qvalue"]])
 fpkm         <- as.numeric(snakemake@wildcards[["fpkm"]])
 set_universe <- as.logical(snakemake@params[["set_universe"]])
+Geneid       <- as.character(snakemake@params[["annot_col"]])
 
 #------------------------------------------------------------------------------------------
 # Prepare data
 #------------------------------------------------------------------------------------------
+# If gene code is ensembl remove the decimals after the end of ensemblid (e.g: ENSMUSG00000000028.15)
+if (Geneid == "ENSEMBL") {
+  DEA.annot <- DEA.annot %>%
+    mutate(!!Geneid = gsub(x = !!Geneid, pattern = "\\.\\d+$", replacement = ""))
+}
+
 # Get UP and DOWN-regulated 
 UP <- DEA.annot %>% 
   dplyr::filter(DEG == "Upregulated") %>% 
-  dplyr::select(Geneid) %>% 
+  dplyr::select(!!Geneid) %>% 
   pull %>%
-  bitr(fromType = "SYMBOL",toType = c("ENTREZID"), OrgDb = org.Mm.eg.db)
+  bitr(fromType = Geneid, toType = c("ENTREZID"), OrgDb = org.Mm.eg.db)
 
 DWN <- DEA.annot %>% 
   dplyr::filter(DEG == "Downregulated") %>% 
-  dplyr::select(Geneid) %>% 
+  dplyr::select(!!Geneid) %>% 
   pull %>%
-  bitr(fromType = "SYMBOL",toType = c("ENTREZID"), OrgDb = org.Mm.eg.db)
+  bitr(fromType = Geneid, toType = c("ENTREZID"), OrgDb = org.Mm.eg.db)
 
 # Get universe of genes. Genes that have been considered for differential expression.
 if (set_universe == TRUE) {
   universe <- DEA.annot %>%
     mutate(max_fpkm = purrr::reduce(dplyr::select(., contains("_FPKM")), pmax)) %>%
     dplyr::filter(max_fpkm > fpkm) %>%
-    dplyr::select(Geneid) %>% 
+    dplyr::select(!!Geneid) %>% 
     pull %>%
-    bitr(fromType = "SYMBOL", toType = c("ENTREZID"), OrgDb = org.Mm.eg.db) %>%
+    bitr(fromType = Geneid, toType = c("ENTREZID"), OrgDb = org.Mm.eg.db) %>%
     pull(ENTREZID)
 } else {
   universe <- DEA.annot %>%
-    dplyr::select(Geneid) %>% 
+    dplyr::select(!!Geneid) %>% 
     pull %>%
-    bitr(fromType = "SYMBOL", toType = c("ENTREZID"), OrgDb = org.Mm.eg.db) %>%
+    bitr(fromType = Geneid, toType = c("ENTREZID"), OrgDb = org.Mm.eg.db) %>%
     pull(ENTREZID)
 }
 

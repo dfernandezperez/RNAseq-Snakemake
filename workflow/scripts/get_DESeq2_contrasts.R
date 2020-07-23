@@ -67,7 +67,7 @@ fpkm_table <- fpkm %>%
 
 
 #------------------------------------------------------------------------------------------
-# Tidy output: Merge FPKM data, sort by p-value, Geneid to column, round to 2 deciamls
+# Tidy output: Merge FPKM data, Geneid to column, round to 2 deciamls
 #------------------------------------------------------------------------------------------
 res.tidy <- as.data.frame(res) %>%
   rownames_to_column(var = "Geneid") %>%
@@ -80,21 +80,24 @@ res.tidy <- as.data.frame(res) %>%
 
 
 #-----------------------------------------------------------------------------
-# Add other annotations (ENSEMBL, ENTREZ...)
+# Add other annotations (ENSEMBL, ENTREZ...) and sort by p-value
 #-----------------------------------------------------------------------------
 if(!is.null(snakemake@params[["annot"]])) {
-  file     <- as.character(snakemake@params[["annot"]])
-  col_used <- as.numeric(snakemake@params[["column_used"]])
-  col_add  <- as.numeric(snakemake@params[["column_toAdd"]])
-  name_add <- as.character(snakemake@params[["name_annotation"]])
+  file      <- as.character(snakemake@params[["annot"]])
+  col_used  <- as.numeric(snakemake@params[["column_used"]])
+  col_add   <- as.numeric(snakemake@params[["column_toAdd"]])
+  name_add  <- as.character(snakemake@params[["name_annotation"]])
+  skip_rows <- as.numeric(snakemake@params[["skip"]])
 
-  res.tidy <- read.delim(file, skip = 1) %>%
+  res.tidy <- read.delim(file, skip = skip_rows) %>%
                 select(!!col_used, !!col_add) %>%
                 setNames(c("Geneid", name_add)) %>%
                 right_join(res.tidy) %>%
                 # Remove any potential duplicates due to
                 # the addition of the new annotation
-                distinct(Geneid, .keep_all = TRUE) 
+                distinct(Geneid, .keep_all = TRUE) %>%
+                arrange(padj)
+
                 
 }
 
