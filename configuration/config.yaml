@@ -40,15 +40,15 @@ ref:
   # Select the genome of the organism, needed to perform GO analyses. Supported: mouse, human.
   genome: "mouse"
   # the STAR index
-  index: /hpcnfs/data/DP/Databases/STAR_GRCm38
+  index: /hpcnfs/data/DP/STAR_INDEXES/v2.7.5a/STAR_GRCm38
   # gtf file with transcripts
-  annotation: /hpcnfs/data/DP/Databases/STAR_GRCm38/gencode.vM21.annotation.gtf
+  annotation: /hpcnfs/data/DP/STAR_INDEXES/v2.7.5a/gencode.vM21.annotation.gtf
   # This will be used to add different annotations to the DEGs table.
   # i.e: ensembl, entrez, ucsc... 
   geneInfo: 
     # path to geneInfo.tab file from STAR
     # leave it blank if there's no file or you don' want to perform this
-    file: /hpcnfs/data/DP/Databases/STAR_GRCm38/geneInfo.tab
+    file: /hpcnfs/data/DP/STAR_INDEXES/v2.7.5a/geneInfo.tab
     # Define the position of the column used for the annotation and the column to add.
     # So, if we used geneSymbol as annotation (2nd column) and we want ENSEMBL (first)
     # Write 2 in used and 1 in toAdd
