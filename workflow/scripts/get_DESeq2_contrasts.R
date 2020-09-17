@@ -94,7 +94,8 @@ if(!is.null(snakemake@params[["annot"]])) {
                 right_join(res.tidy) %>%
                 # Remove any potential duplicates due to
                 # the addition of the new annotation
-                distinct(Geneid, .keep_all = TRUE) 
+                distinct(Geneid, .keep_all = TRUE) %>%
+                arrange(padj) # Sort by pvalue because this changes this order
                 
 }
 

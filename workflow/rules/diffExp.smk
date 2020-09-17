@@ -52,7 +52,9 @@ rule pca:
     input:
         rules.deseq2.output.rds
     output:
-        "results/04deseq2/pca.pdf"
+        "results/04deseq2/pca_elipse_names.pdf",
+        "results/04deseq2/pca.pdf",
+        "results/04deseq2/pca_names.pdf"
     params:
         pca_labels = config["pca"]["labels"]
     log:

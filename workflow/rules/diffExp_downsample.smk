@@ -53,7 +53,9 @@ rule pca_downsampled:
     input:
         rules.deseq2_downsampled.output.rds
     output:
-        "results/04deseq2/downsampled/pca.pdf"
+        "results/04deseq2/downsampled/pca_elipse_names.pdf",
+        "results/04deseq2/downsampled/pca.pdf",
+        "results/04deseq2/downsampled/pca_names.pdf"
     params:
         pca_labels = config["pca"]["labels"]
     log:
