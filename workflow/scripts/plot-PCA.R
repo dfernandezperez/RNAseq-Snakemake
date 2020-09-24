@@ -64,5 +64,5 @@ p3 <- pcaplot(counts, intgroup = grouping, ellipse = FALSE, text_labels = TRUE, 
 # Save to file
 #------------------------------------------------------------------------------------------
 ggsave(filename = snakemake@output[[1]], p1, width = 6, height = 6)
-ggsave(filename = snakemake@output[[3]], p2, width = 6, height = 6)
-ggsave(filename = snakemake@output[[4]], p3)
+ggsave(filename = snakemake@output[[2]], p2, width = 6, height = 6)
+ggsave(filename = snakemake@output[[3]], p3)
