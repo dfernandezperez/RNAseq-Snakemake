@@ -54,14 +54,10 @@ p1 <- plotPCA(counts, intgroup = grouping, ntop = ntop) +
   geom_mark_ellipse(aes(fill = group, label = group), con.cap = 0, expand = unit(3, "mm"), label.fontsize = 14)
 
 p2 <- plotPCA(counts, intgroup = grouping, ntop = ntop) +
-  theme_custom + 
-  geom_mark_ellipse(aes(fill = group), con.cap = 0, expand = unit(3, "mm"), label.fontsize = 14)
-
-p3 <- plotPCA(counts, intgroup = grouping, ntop = ntop) +
   theme_custom
 
 # PCA with sample labels. We use this other function from pcaExplorer for simplicity
-p4 <- pcaplot(counts, intgroup = grouping, ellipse = FALSE, text_labels = TRUE, ntop = ntop)
+p3 <- pcaplot(counts, intgroup = grouping, ellipse = FALSE, text_labels = TRUE, ntop = ntop)
 
 
 #------------------------------------------------------------------------------------------
@@ -69,5 +65,4 @@ p4 <- pcaplot(counts, intgroup = grouping, ellipse = FALSE, text_labels = TRUE, 
 #------------------------------------------------------------------------------------------
 ggsave(filename = snakemake@output[[1]], p1, width = 6, height = 6)
 ggsave(filename = snakemake@output[[2]], p2, width = 6, height = 6)
-ggsave(filename = snakemake@output[[3]], p3, width = 6, height = 6)
-ggsave(filename = snakemake@output[[4]], p4)
+ggsave(filename = snakemake@output[[3]], p3)
