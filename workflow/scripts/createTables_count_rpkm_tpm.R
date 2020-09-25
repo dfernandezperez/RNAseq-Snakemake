@@ -13,7 +13,7 @@ source("workflow/scripts/custom_functions.R")
 read_files <- snakemake@input %>%
   purrr::map(read.delim, header = TRUE) %>%
   purrr::map(setNames, c("Geneid", "Length", "Effective_Length", "TPM", "Counts")) %>%
-  purrr::map(~ mutate(.x, fpkm = do_tpm(Counts,Effective_Length)))
+  purrr::map(~ mutate(.x, fpkm = do_tpm(Counts,Length)))
   
 sample_names <- as.character(snakemake@params[["sample_names"]])
 

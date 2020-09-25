@@ -35,15 +35,8 @@ if(!is.null(snakemake@params[["exclude"]])) {
 files <- files[as.character(colData$sample)]
 stopifnot(identical(names(files), as.character(colData$sample)))
 
-# txi <- tximport(files, type = "salmon", tx2gene = tx2gene) # Load salmon quant files
-
-# dds <- DESeqDataSetFromTximport(txi     = txi,
-#                                 colData = colData,
-#                                 design  = ~ condition)
-
-txi <- tximport(files, type = "salmon", tx2gene = tx2gene, countsFromAbundance = "scaledTPM") # Load salmon quant files
-
-dds <- DESeqDataSetFromMatrix(countData   = round(txi$counts),
+txi <- tximport(files, type = "salmon", tx2gene = tx2gene) # Load salmon quant files
+dds <- DESeqDataSetFromTximport(txi       = txi,
                                 colData   = colData,
                                 design    = ~ condition)
 
