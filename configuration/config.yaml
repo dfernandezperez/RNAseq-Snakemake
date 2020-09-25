@@ -42,8 +42,11 @@ ref:
   # the STAR index
   index: /hpcnfs/data/DP/STAR_INDEXES/v2.7.5a/GRCm38
   # gtf file with transcripts
-  annotation: /hpcnfs/data/DP/STAR_INDEXES/v2.7.5a/GRCm38/gencode.vM21.annotation.gtf
-  transcriptome:  /hpcnfs/data/DP/STAR_INDEXES/v2.7.5a/GRCm38/gencode.vM21.transcripts.fa
+  annotation: /hpcnfs/data/DP/GENCODE_GENOMES/GRCm38/M21/gencode.vM21.annotation.gtf.gz
+  # fasta of transcripts
+  transcriptome:  /hpcnfs/data/DP/GENCODE_GENOMES/GRCm38/M21/gencode.vM21.transcripts.fa.gz
+  # assembly of genome
+  assembly: /hpcnfs/data/DP/GENCODE_GENOMES/GRCm38/M21/GRCm38.primary_assembly.genome.fa.gz
   # Name of the annotation (ensembl, symbol, entrez...) it will be the column name of the genes
   # It will also be the column used for the conversion of gene-to-entrez for clusterProfiler.
   # The name has to be compatible with org.Mm.eg.db or org.Hg.eg.db
@@ -52,7 +55,7 @@ ref:
   # i.e: ensembl, entrez, ucsc... 
   geneInfo: 
     # path to geneInfo.tab file from STAR
-    # leave it blank if there's no file or you don' want to perform this
+    # leave it blank if there's no file or you don't want to perform this
     file: /hpcnfs/data/DP/STAR_INDEXES/v2.7.5a/GRCm38/geneInfo.tab
     # Define the position of the column used for the annotation and the column to add.
     # So, if we used geneSymbol as annotation (2nd column) and we want ENSEMBL (first)
@@ -121,7 +124,9 @@ params:
   star: "--readFilesCommand zcat"
   # By now the column used by featureCounts MUST contain the SYMBOL annotation since it's the one
   # used to transform gene names to ENTREZID for the enrichment analysis
-  salmon: "--gencode"
+  salmon: "--gencode --gcBias --seqBias --validateMappings"
+  # Library type (stranded, non-stranded, inward,outward...). A means automatic, salmon will care about it.
+  salmon_library: "A"
   # In case trimming is set to true, define trimmining parameters
   fastp-se: "--stdin -t 1 -A -Q -L"
   fastp-pe: "-t 1 -A -Q -L"

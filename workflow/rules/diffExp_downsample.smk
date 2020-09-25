@@ -1,6 +1,6 @@
 rule create_tables_downsampled:
     input:
-        expand("results/03salmonQuant/{sample}/quant.genes.sf", sample = SAMPLES)
+        expand("results/02_salmon/{sample}/quant.genes.sf", sample = SAMPLES)
     output:
         tpm         = "results/04deseq2/downsampled/tpm.tsv",
         fpkm        = "results/04deseq2/downsampled/fpkm.tsv",

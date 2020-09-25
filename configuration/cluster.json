@@ -1,48 +1,54 @@
 {
-	"__default__" :
-	{
-		"cpu"         : 1,
-		"email"       : "`whoami`@ieo.it",
-		"EmailNotice" : "n",
-		"jname"       : "{rule}",
-		"output"      : "results/.clusterLogs/{rule}.{wildcards}.out",
-		"error"       : "results/.clusterLogs/{rule}.{wildcards}.err",
-		"MaxMem"      : 8
-	},
-	"fastp_pe" :
-	{
-		"cpu" : 5
-	},
-	"fastp_se" :
-	{
-		"cpu" : 5
-	},
-	"fastqc":
-	{
-		"cpu" : 1
-	},
-	"star":
-	{
-		"cpu" : 8,
-		"MaxMem" : 40
-	},
-	"salmonQuant":
-	{
-		"cpu" : 8,
-		"MaxMem" : 20
+    "__default__" :
+    {
+        "cpu"         : 1,
+        "email"       : "`whoami`@ieo.it",
+        "EmailNotice" : "n",
+        "jname"       : "{rule}",
+        "output"      : "results/.clusterLogs/{rule}.{wildcards}.out",
+        "error"       : "results/.clusterLogs/{rule}.{wildcards}.err",
+        "MaxMem"      : 8
+    },
+    "fastp_pe" :
+    {
+        "cpu" : 5
+    },
+    "fastp_se" :
+    {
+        "cpu" : 5
+    },
+    "fastqc":
+    {
+        "cpu" : 1
+    },
+    "star":
+    {
+        "cpu" : 8,
+        "MaxMem" : 40
+    },
+    "salmon_index":
+    {
+        "cpu" : 10,
+        "MaxMem" : 40
 
-	},
-	"deseq2":
-	{
-		"MaxMem" : 16,
-		"EmailNotice": "e"
-	},
-	"deg_analysis":
-	{
-		"EmailNotice": "e"
-	},
-	"bam2bigwig":
-	{
-		"cpu" : 1
-	}
+    },
+    "salmonQuant":
+    {
+        "cpu" : 8,
+        "MaxMem" : 20
+
+    },
+    "deseq2":
+    {
+        "MaxMem" : 16,
+        "EmailNotice": "e"
+    },
+    "deg_analysis":
+    {
+        "EmailNotice": "e"
+    },
+    "bam2bigwig":
+    {
+        "cpu" : 1
+    }
 }

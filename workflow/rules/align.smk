@@ -45,33 +45,149 @@ rule star:
         | samtools view -Sb - > {output.bam} 2>> {log.align}
         """
 
-rule salmon_quant:
+# the commands of the index rule were obtained from here: https://combine-lab.github.io/alevin-tutorial/2019/selective-alignment/
+rule salmon_index:
     input:
-        rules.star.output.bam
+        primary_assembly = config["ref"]["assembly"],
+        transcripts      = config["ref"]["transcriptome"],
     output:
-        "results/03salmonQuant/{sample}/quant.sf"
+        index = "results/02_salmon/salmon_index",
+    log:
+        "results/00log/salmonIndex/log"
+    threads:
+        CLUSTER["salmon_index"]["cpu"]
+    shadow: 
+        "minimal"
+    benchmark:
+        "index_benchmark.txt"
+    shell:
+        """
+        grep "^>" <(gunzip -c {input.primary_assembly}) \
+        | cut -d " " -f 1 > decoys.txt
+        sed -i.bak -e 's/>//g' decoys.txt
+        cat {input.transcripts} {input.primary_assembly} > gentrome.fa.gz
+        salmon index -t gentrome.fa.gz -d decoys.txt -p {threads} -i salmon_index --gencode
+        """
+
+rule salmon_quant_pe:
+    input:
+        fw    = lambda w: expand("results/fastq/{lane.sample}-{lane.lane}.1.fastq.gz", lane=units.loc[w.sample].itertuples()),
+        rv    = lambda w: expand("results/fastq/{lane.sample}-{lane.lane}.2.fastq.gz", lane=units.loc[w.sample].itertuples()),
+        index = rules.salmon_index.output.index
+    output:
+        quant = "results/02_salmon/{sample}/quant.sf",
+        sam   = "results/02_salmon/{sample}/{sample}.sam",
     log: 
         "results/00log/salmonQuant/{sample}.log"
     params:
-        transcriptome = config["ref"]["transcriptome"],
         gtf           = config["ref"]["annotation"],
         options       = config["params"]["salmon"],
-        out_fold      = "results/03salmonQuant/{sample}"
-    threads:
+        library       = config["params"]["salmon_library"],
+        out_fold      = "results/02_salmon/{sample}",
+    threads:    
         CLUSTER["salmonQuant"]["cpu"]
     shell:
         """
         salmon quant \
-        -t {params.transcriptome} \
+        -i {input.index} \
         -p {threads} \
         -g {params.gtf} \
-        -l A \
-        --gcBias \
-        -a {input} \
+        -l {params.library}\
+        -1 {input.fw} -2 {input.rv} \
         -o {params.out_fold} \
         {params.options} \
-        2> {log}
+        2> {log} \
+        > {output.sam}
         """
+
+# rule salmon_quant_se:
+#     input:
+#         lambda w: expand("results/fastq/{lane.sample}-{lane.lane}.fastq.gz", lane=units.loc[w.sample].itertuples()),
+#     output:
+#         quant = "results/03salmonQuant/{sample}/quant.sf",
+#         sam   = "results/03salmonQuant/{sample}/{sample}.sam",
+#     log: 
+#         "results/00log/salmonQuant/{sample}.log"
+#     params:
+#         transcriptome = config["ref"]["transcriptome"],
+#         gtf           = config["ref"]["annotation"],
+#         options       = config["params"]["salmon"],
+#         library       = config["params"]["salmon_library"],
+#         out_fold      = "results/03salmonQuant/{sample}",
+#     threads:    
+#         CLUSTER["salmonQuant"]["cpu"]
+#     shell:
+#         """
+#         salmon quant \
+#         -i {params.salmon_index } \
+#         -p {threads} \
+#         -g {params.gtf} \
+#         -l {params.library}\
+#         -r {input} \
+#         -o {params.out_fold} \
+#         {params.options} \
+#         2> {log} \
+#         > {output.sam}
+#         """
+
+# rule salmon_quant:
+#     input:
+#         rules.star.output.bam
+#     output:
+#         quant = "results/03salmonQuant/{sample}/quant.sf",
+#         sam   = "results/03salmonQuant/{sample}/{sample}.sam",
+#     log: 
+#         "results/00log/salmonQuant/{sample}.log"
+#     params:
+#         transcriptome = config["ref"]["transcriptome"],
+#         gtf           = config["ref"]["annotation"],
+#         options       = config["params"]["salmon"],
+#         library       = config["params"]["salmon_library"],
+#         out_fold      = "results/03salmonQuant/{sample}",
+#         reads         = set_reads,
+#     threads:    
+#         CLUSTER["salmonQuant"]["cpu"]
+#     shell:
+#         """
+#         salmon quant \
+#         -i {params.salmon_index } \
+#         -p {threads} \
+#         -g {params.gtf} \
+#         -l {params.library}\
+#         {params.reads} \
+#         -o {params.out_fold} \
+#         {params.options} \
+#         2> {log} \
+#         > {output.sam}
+#         """
+
+# rule salmon_quant:
+#     input:
+#         rules.star.output.bam
+#     output:
+#         "results/03salmonQuant/{sample}/quant.sf"
+#     log: 
+#         "results/00log/salmonQuant/{sample}.log"
+#     params:
+#         transcriptome = config["ref"]["transcriptome"],
+#         gtf           = config["ref"]["annotation"],
+#         options       = config["params"]["salmon"],
+#         library       = config["params"]["salmon_library"],
+#         out_fold      = "results/03salmonQuant/{sample}"
+#     threads:    
+#         CLUSTER["salmonQuant"]["cpu"]
+#     shell:
+#         """
+#         salmon quant \
+#         -t {params.transcriptome} \
+#         -p {threads} \
+#         -g {params.gtf} \
+#         -l {params.library}\
+#         -a {input} \
+#         -o {params.out_fold} \
+#         {params.options} \
+#         2> {log}
+#         """
 
 # rule featureCounts:
 #     input:

@@ -1,6 +1,6 @@
 rule create_tables:
     input:
-        expand("results/03salmonQuant/{sample}/quant.genes.sf", sample = SAMPLES)
+        expand("results/02_salmon/{sample}/quant.genes.sf", sample = SAMPLES)
     output:
         tpm         = "results/04deseq2/tpm.tsv",
         fpkm        = "results/04deseq2/fpkm.tsv",
@@ -15,7 +15,7 @@ rule create_tables:
  
 rule deseq2:
     input:
-        expand("results/03salmonQuant/{sample}/quant.sf", sample = SAMPLES)
+        expand("results/02_salmon/{sample}/quant.sf", sample = SAMPLES)
     output:
         rds         = "results/04deseq2/all.rds",
         norm_counts = "results/04deseq2/Normalized_counts.tsv",
