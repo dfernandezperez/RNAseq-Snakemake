@@ -42,7 +42,7 @@ ref:
   # the STAR index
   index: /hpcnfs/data/DP/STAR_INDEXES/v2.7.5a/GRCm38
   # gtf file with transcripts
-  annotation: /hpcnfs/data/DP/GENCODE_GENOMES/GRCm38/M21/gencode.vM21.annotation.gtf.gz
+  annotation: /hpcnfs/data/DP/GENCODE_GENOMES/GRCm38/M21/gencode.vM21.annotation.gtf
   # fasta of transcripts
   transcriptome:  /hpcnfs/data/DP/GENCODE_GENOMES/GRCm38/M21/gencode.vM21.transcripts.fa.gz
   # assembly of genome
@@ -124,7 +124,7 @@ params:
   star: "--readFilesCommand zcat"
   # By now the column used by featureCounts MUST contain the SYMBOL annotation since it's the one
   # used to transform gene names to ENTREZID for the enrichment analysis
-  salmon: "--gencode --gcBias --seqBias --validateMappings"
+  salmon: "--gcBias --seqBias --validateMappings"
   # Library type (stranded, non-stranded, inward,outward...). A means automatic, salmon will care about it.
   salmon_library: "A"
   # In case trimming is set to true, define trimmining parameters

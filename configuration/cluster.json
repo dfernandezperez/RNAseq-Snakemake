@@ -32,7 +32,13 @@
         "MaxMem" : 40
 
     },
-    "salmonQuant":
+    "salmon_quant_pe":
+    {
+        "cpu" : 8,
+        "MaxMem" : 20
+
+    },
+    "salmon_quant_se":
     {
         "cpu" : 8,
         "MaxMem" : 20

@@ -51,7 +51,7 @@ rule salmon_index:
         primary_assembly = config["ref"]["assembly"],
         transcripts      = config["ref"]["transcriptome"],
     output:
-        index = "results/02_salmon/salmon_index",
+        index = directory("results/02_salmon/salmon_index"),
     log:
         "results/00log/salmonIndex/log"
     threads:
@@ -75,8 +75,9 @@ rule salmon_quant_pe:
         rv    = lambda w: expand("results/fastq/{lane.sample}-{lane.lane}.2.fastq.gz", lane=units.loc[w.sample].itertuples()),
         index = rules.salmon_index.output.index
     output:
-        quant = "results/02_salmon/{sample}/quant.sf",
-        sam   = "results/02_salmon/{sample}/{sample}.sam",
+        quant       = "results/02_salmon/{sample}/quant.sf",
+        quant_genes = "results/02_salmon/{sample}/quant.genes.sf",
+        sam         = "results/02_salmon/{sample}/{sample}.sam",
     log: 
         "results/00log/salmonQuant/{sample}.log"
     params:
@@ -85,7 +86,7 @@ rule salmon_quant_pe:
         library       = config["params"]["salmon_library"],
         out_fold      = "results/02_salmon/{sample}",
     threads:    
-        CLUSTER["salmonQuant"]["cpu"]
+        CLUSTER["salmon_quant_pe"]["cpu"]
     shell:
         """
         salmon quant \
@@ -115,7 +116,7 @@ rule salmon_quant_pe:
 #         library       = config["params"]["salmon_library"],
 #         out_fold      = "results/03salmonQuant/{sample}",
 #     threads:    
-#         CLUSTER["salmonQuant"]["cpu"]
+#         CLUSTER["salmon_quant_se"]["cpu"]
 #     shell:
 #         """
 #         salmon quant \
@@ -130,64 +131,6 @@ rule salmon_quant_pe:
 #         > {output.sam}
 #         """
 
-# rule salmon_quant:
-#     input:
-#         rules.star.output.bam
-#     output:
-#         quant = "results/03salmonQuant/{sample}/quant.sf",
-#         sam   = "results/03salmonQuant/{sample}/{sample}.sam",
-#     log: 
-#         "results/00log/salmonQuant/{sample}.log"
-#     params:
-#         transcriptome = config["ref"]["transcriptome"],
-#         gtf           = config["ref"]["annotation"],
-#         options       = config["params"]["salmon"],
-#         library       = config["params"]["salmon_library"],
-#         out_fold      = "results/03salmonQuant/{sample}",
-#         reads         = set_reads,
-#     threads:    
-#         CLUSTER["salmonQuant"]["cpu"]
-#     shell:
-#         """
-#         salmon quant \
-#         -i {params.salmon_index } \
-#         -p {threads} \
-#         -g {params.gtf} \
-#         -l {params.library}\
-#         {params.reads} \
-#         -o {params.out_fold} \
-#         {params.options} \
-#         2> {log} \
-#         > {output.sam}
-#         """
-
-# rule salmon_quant:
-#     input:
-#         rules.star.output.bam
-#     output:
-#         "results/03salmonQuant/{sample}/quant.sf"
-#     log: 
-#         "results/00log/salmonQuant/{sample}.log"
-#     params:
-#         transcriptome = config["ref"]["transcriptome"],
-#         gtf           = config["ref"]["annotation"],
-#         options       = config["params"]["salmon"],
-#         library       = config["params"]["salmon_library"],
-#         out_fold      = "results/03salmonQuant/{sample}"
-#     threads:    
-#         CLUSTER["salmonQuant"]["cpu"]
-#     shell:
-#         """
-#         salmon quant \
-#         -t {params.transcriptome} \
-#         -p {threads} \
-#         -g {params.gtf} \
-#         -l {params.library}\
-#         -a {input} \
-#         -o {params.out_fold} \
-#         {params.options} \
-#         2> {log}
-#         """
 
 # rule featureCounts:
 #     input:
