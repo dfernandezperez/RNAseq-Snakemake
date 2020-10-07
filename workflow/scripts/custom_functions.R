@@ -60,7 +60,7 @@ goEnrichment <- function(
   universe = NULL
   ) {
   require(clusterProfiler)
-    ego <- enrichGO(gene          = df$ENTREZID,
+    ego <- enrichGO(gene          = df,
                   OrgDb         = db,
                   keyType       = 'ENTREZID',
                   ont           = ont,
@@ -81,7 +81,7 @@ KEGGenrichment <- function(
   universe = NULL
   ) {
   require(clusterProfiler)
-  ekgg <- enrichKEGG(gene          = df$ENTREZID,
+  ekgg <- enrichKEGG(gene          = df,
                      organism      = org,
                      pAdjustMethod = "BH",
                      pvalueCutoff  = pvalue,
@@ -100,13 +100,35 @@ PAenrichment <- function(
   ) {
   require(clusterProfiler)
   require(ReactomePA)
-  ePA <- enrichPathway(gene         = df$ENTREZID,
+  ePA <- enrichPathway(gene         = df,
                        pvalueCutoff = pvalue,
                        qvalueCutoff = qvalue,
                        organism     = org,
                        universe     = universe,
                        readable     = TRUE)
   return(ePA)
+}
+
+msig_db_enrichment <- function(
+  df, 
+  db        = org.Mm.eg.db, 
+  pvalue    = 0.05, 
+  qvalue    = 0.1,
+  universe  = NULL,
+  term2gene = term2gene
+) {
+  require(clusterProfiler)
+  GSEA_hyp  <- enricher(gene        = df,
+                       pvalueCutoff = pvalue,
+                       qvalueCutoff = qvalue,
+                       TERM2GENE    = term2gene)
+  if(is.null(GSEA_hyp)){
+    return(data.frame())
+  }
+  else{
+    GSEA_hyp <- DOSE::setReadable(GSEA_hyp, OrgDb = db, keyType="ENTREZID")
+    return(GSEA_hyp)
+  }
 }
 
 GSEA_enrichment <- function(df, pathways.gmt) {
@@ -127,14 +149,13 @@ GSEA_enrichment <- function(df, pathways.gmt) {
 }
 
 
-
 #----------------------------------------------------------------------------------------------
 # Volcano plot code
 #----------------------------------------------------------------------------------------------
 VolcanoPlot <- function(df, xlim=NULL, ylim=NULL, main = NULL, labelSize = 8, pval = 0.05, log2FC = 1) {
   require(ggplot2)
   require(dplyr)
-  require(ggrastr)
+  # require(ggrastr)
 
   df <- mutate(df, shape = "circle")
 
@@ -150,8 +171,8 @@ VolcanoPlot <- function(df, xlim=NULL, ylim=NULL, main = NULL, labelSize = 8, pv
 
   p <-  ggplot(data = na.omit(df), aes(x=log2FoldChange, y=-log10(padj), colour=DEG, shape=shape) ) +
 
-    geom_point_rast(alpha=0.7, size=1.7, raster.height = 5.15, raster.width = 6, raster.dpi = 400) +
-    # geom_point(alpha=0.7, size=1.7) +
+    # geom_point_rast(alpha=0.7, size=1.7, raster.height = 5.15, raster.width = 6, raster.dpi = 400) +
+    geom_point(alpha=0.7, size=1.7) +
 
     annotate("text", label = sum(df$DEG == "Upregulated"), color = "red", y = 0, x = xlim[2],
              vjust="inward",hjust="inward", size = labelSize) +
