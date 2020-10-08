@@ -14,9 +14,9 @@ def get_fq(wildcards):
         # no trimming, use raw reads
         if not is_single_end(**wildcards):
             # paired-end sample
-            return expand("{tmp}/fastq/{sample}.{group}.fastq.gz", group=[1, 2], **wildcards, tmp = config["tmp"])
+            return expand("results/fastq/{lane.sample}-{lane.lane}.{group}.fastq.gz", lane=units.loc[wildcards.sample].itertuples(), group=[1,2], **wildcards)
         # single end sample
-        return "{tmp}/fastq/{sample}.se.fastq.gz".format(tmp = config["tmp"], **wildcards)
+        return expand("results/fastq/{lane.sample}-{lane.lane}.se.fastq.gz", lane=units.loc[wildcards.sample].itertuples(), **wildcards)
 
 
 # Get raw or trimmed reads based on trimming configuration. Used for fastqc

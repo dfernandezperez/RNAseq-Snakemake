@@ -1,3 +1,50 @@
+# Most star parameters taken from https://www.biorxiv.org/content/biorxiv/early/2019/10/31/657874.full.pdf
+rule star:
+    input:
+        get_fq
+    output:
+        bam   = "results/02alignments/{sample}/{sample}.bam",
+        log   = "results/02alignments/{sample}/Log.final.out"
+    log:
+        align   = "results/00log/alignments/{sample}.log",
+        rm_dups = "results/00log/alignments/rm_dup/{sample}.log",
+    params:
+        out_dir      = "results/02alignments/{sample}/",
+        star_params  = config["params"]["star"],
+        # path to STAR reference genome index
+        index        = config["ref"]["index"],
+        samtools_mem = config["params"]["samtools_mem"]
+    threads:
+        CLUSTER["star"]["cpu"]
+    shadow: 
+        "minimal"
+    shell: 
+        """
+        STAR --genomeDir {params.index} \
+        --runThreadN {threads} \
+        --readFilesIn {input} \
+        --outFileNamePrefix {params.out_dir} \
+        --outSAMtype None \
+        --outStd Log \
+        --quantMode TranscriptomeSAM \
+        --outSAMunmapped Within \
+        --quantTranscriptomeBan Singleend \
+        --outFilterType BySJout \
+        --alignSJoverhangMin 8 \
+        --outFilterMultimapNmax 20 \
+        --alignSJDBoverhangMin 1 \
+        --outFilterMismatchNmax 999 \
+        --outFilterMismatchNoverReadLmax 0.04 \
+        --alignIntronMin 20 \
+        --alignIntronMax 1000000 \
+        --alignMatesGapMax 1000000 \
+        {params.star_params} > {log.align}
+
+        samtools view -h {params.out_dir}Aligned.toTranscriptome.out.bam \
+        | samblaster --removeDups 2> {log.rm_dups} \
+        | samtools view -Sb - > {output.bam} 2>> {log.align}
+        """
+
 # the commands of the index rule were obtained from here: https://combine-lab.github.io/alevin-tutorial/2019/selective-alignment/
 rule salmon_index:
     input:
@@ -19,14 +66,23 @@ rule salmon_index:
         | cut -d " " -f 1 > decoys.txt
         sed -i.bak -e 's/>//g' decoys.txt
         cat {input.transcripts} {input.primary_assembly} > gentrome.fa.gz
-        salmon index -t gentrome.fa.gz -d decoys.txt -p {threads} -i {output.index} --gencode
+        salmon index -t gentrome.fa.gz -d decoys.txt -p {threads} -i {output} --gencode
         """
 
-rule salmon_quant_pe:
+
+def set_reads(wildcards, input):
+        n = len(input.fastq)
+        if n == 1:
+            reads = "-r {}".format(*input.fastq)
+            return reads
+        else:
+            reads = "-1 {} -2 {}".format(*input.fastq)
+            return reads
+
+rule salmon_quant:
     input:
-        fw    = lambda w: expand("results/fastq/{lane.sample}-{lane.lane}.1.fastq.gz", lane=units.loc[w.sample].itertuples()),
-        rv    = lambda w: expand("results/fastq/{lane.sample}-{lane.lane}.2.fastq.gz", lane=units.loc[w.sample].itertuples()),
-        index = rules.salmon_index.output.index
+        index = "results/02_salmon/salmon_index",
+        fastq = get_fq,
     output:
         quant       = "results/02_salmon/{sample}/quant.sf",
         quant_genes = "results/02_salmon/{sample}/quant.genes.sf",
@@ -38,6 +94,7 @@ rule salmon_quant_pe:
         options       = config["params"]["salmon"],
         library       = config["params"]["salmon_library"],
         out_fold      = "results/02_salmon/{sample}",
+        reads  	      = set_reads,
     threads:    
         CLUSTER["salmon_quant_pe"]["cpu"]
     shell:
@@ -47,19 +104,53 @@ rule salmon_quant_pe:
         -p {threads} \
         -g {params.gtf} \
         -l {params.library}\
-        -1 {input.fw} -2 {input.rv} \
+        {params.reads} \
         -o {params.out_fold} \
         {params.options} \
         2> {log} \
         > {output.sam}
         """
 
+# rule salmon_quant_pe:
+#     input:
+#         fw    = lambda w: expand("results/fastq/{lane.sample}-{lane.lane}.1.fastq.gz", lane=units.loc[w.sample].itertuples()),
+#         rv    = lambda w: expand("results/fastq/{lane.sample}-{lane.lane}.2.fastq.gz", lane=units.loc[w.sample].itertuples()),
+#         index = rules.salmon_index.output.index
+#     output:
+#         quant       = "results/02_salmon/{sample}/quant.sf",
+#         quant_genes = "results/02_salmon/{sample}/quant.genes.sf",
+#         sam         = "results/02_salmon/{sample}/{sample}.sam",
+#     log: 
+#         "results/00log/salmonQuant/{sample}.log"
+#     params:
+#         gtf           = config["ref"]["annotation"],
+#         options       = config["params"]["salmon"],
+#         library       = config["params"]["salmon_library"],
+#         out_fold      = "results/02_salmon/{sample}",
+#     threads:    
+#         CLUSTER["salmon_quant_pe"]["cpu"]
+#     shell:
+#         """
+#         salmon quant \
+#         -i {input.index} \
+#         -p {threads} \
+#         -g {params.gtf} \
+#         -l {params.library}\
+#         -1 {input.fw} -2 {input.rv} \
+#         -o {params.out_fold} \
+#         {params.options} \
+#         2> {log} \
+#         > {output.sam}
+#         """
+
 # rule salmon_quant_se:
 #     input:
-#         lambda w: expand("results/fastq/{lane.sample}-{lane.lane}.fastq.gz", lane=units.loc[w.sample].itertuples()),
+#         fq    = lambda w: expand("results/fastq/{lane.sample}-{lane.lane}.se.fastq.gz", lane=units.loc[w.sample].itertuples()),
+#         index = rules.salmon_index.output.index
 #     output:
-#         quant = "results/03salmonQuant/{sample}/quant.sf",
-#         sam   = "results/03salmonQuant/{sample}/{sample}.sam",
+#         quant       = "results/02_salmon/{sample}/quant.sf",
+#         quant_genes = "results/02_salmon/{sample}/quant.genes.sf",
+#         sam         = "results/02_salmon/{sample}/{sample}.sam",
 #     log: 
 #         "results/00log/salmonQuant/{sample}.log"
 #     params:
@@ -73,66 +164,15 @@ rule salmon_quant_pe:
 #     shell:
 #         """
 #         salmon quant \
-#         -i {params.salmon_index } \
+#         -i {input.index} \
 #         -p {threads} \
 #         -g {params.gtf} \
 #         -l {params.library}\
-#         -r {input} \
+#         -r {input.fq} \
 #         -o {params.out_fold} \
 #         {params.options} \
 #         2> {log} \
 #         > {output.sam}
-#         """
-
-
-
-
-
-# # Most star parameters taken from https://www.biorxiv.org/content/biorxiv/early/2019/10/31/657874.full.pdf
-# rule star:
-#     input:
-#         get_fq
-#     output:
-#         bam   = "results/02alignments/{sample}/{sample}.bam",
-#         log   = "results/02alignments/{sample}/Log.final.out"
-#     log:
-#         align   = "results/00log/alignments/{sample}.log",
-#         rm_dups = "results/00log/alignments/rm_dup/{sample}.log",
-#     params:
-#         out_dir      = "results/02alignments/{sample}/",
-#         star_params  = config["params"]["star"],
-#         # path to STAR reference genome index
-#         index        = config["ref"]["index"],
-#         samtools_mem = config["params"]["samtools_mem"]
-#     threads:
-#         CLUSTER["star"]["cpu"]
-#     shadow: 
-#         "minimal"
-#     shell: 
-#         """
-#         STAR --genomeDir {params.index} \
-#         --runThreadN {threads} \
-#         --readFilesIn {input} \
-#         --outFileNamePrefix {params.out_dir} \
-#         --outSAMtype None \
-#         --outStd Log \
-#         --quantMode TranscriptomeSAM \
-#         --outSAMunmapped Within \
-#         --quantTranscriptomeBan Singleend \
-#         --outFilterType BySJout \
-#         --alignSJoverhangMin 8 \
-#         --outFilterMultimapNmax 20 \
-#         --alignSJDBoverhangMin 1 \
-#         --outFilterMismatchNmax 999 \
-#         --outFilterMismatchNoverReadLmax 0.04 \
-#         --alignIntronMin 20 \
-#         --alignIntronMax 1000000 \
-#         --alignMatesGapMax 1000000 \
-#         {params.star_params} > {log.align}
-
-#         samtools view -h {params.out_dir}Aligned.toTranscriptome.out.bam \
-#         | samblaster --removeDups 2> {log.rm_dups} \
-#         | samtools view -Sb - > {output.bam} 2>> {log.align}
 #         """
 
 
