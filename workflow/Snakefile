@@ -89,7 +89,7 @@ rule all_downsampled_test:
 ##### load rules #####
 include: "rules/common.smk"
 include: "rules/trim.smk"
-include: "rules/align.smk"
+include: "rules/quant.smk"
 include: "rules/diffExp.smk"
 include: "rules/diffExp_downsample.smk"
 include: "rules/qc.smk"

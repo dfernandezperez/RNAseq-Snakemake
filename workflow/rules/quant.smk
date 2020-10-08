@@ -96,7 +96,7 @@ rule salmon_quant:
         out_fold      = "results/02_salmon/{sample}",
         reads  	      = set_reads,
     threads:    
-        CLUSTER["salmon_quant_pe"]["cpu"]
+        CLUSTER["salmon_quant"]["cpu"]
     shell:
         """
         salmon quant \
