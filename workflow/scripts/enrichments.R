@@ -23,40 +23,6 @@ qvalue       <- as.numeric(snakemake@params[["qvalue"]])
 fpkm         <- as.numeric(snakemake@wildcards[["fpkm"]])
 set_universe <- as.logical(snakemake@params[["set_universe"]])
 
-#------------------------------------------------------------------------------------------
-# Prepare data
-#------------------------------------------------------------------------------------------
-# Get UP and DOWN-regulated 
-UP <- DEA.annot %>% 
-  dplyr::filter(DEG == "Upregulated") %>% 
-  dplyr::select(Geneid) %>% 
-  pull %>%
-  bitr(fromType = "SYMBOL",toType = c("ENTREZID"), OrgDb = org.Mm.eg.db) %>%
-  pull(ENTREZID)
-
-DWN <- DEA.annot %>% 
-  dplyr::filter(DEG == "Downregulated") %>% 
-  dplyr::select(Geneid) %>% 
-  pull %>%
-  bitr(fromType = "SYMBOL",toType = c("ENTREZID"), OrgDb = org.Mm.eg.db) %>%
-  pull(ENTREZID)
-
-# Get universe of genes. Genes that have been considered for differential expression.
-if (set_universe == TRUE) {
-  universe <- DEA.annot %>%
-    mutate(max_fpkm = purrr::reduce(dplyr::select(., contains("_FPKM")), pmax)) %>%
-    dplyr::filter(max_fpkm > fpkm) %>%
-    dplyr::select(Geneid) %>% 
-    pull %>%
-    bitr(fromType = "SYMBOL", toType = c("ENTREZID"), OrgDb = org.Mm.eg.db) %>%
-    pull(ENTREZID)
-} else {
-  universe <- DEA.annot %>%
-    dplyr::select(Geneid) %>% 
-    pull %>%
-    bitr(fromType = "SYMBOL", toType = c("ENTREZID"), OrgDb = org.Mm.eg.db) %>%
-    pull(ENTREZID)
-}
 
 # Set mouse or human references for the databases
 if (genome == "mouse") { 
@@ -81,6 +47,40 @@ if (genome == "mouse") {
                    as.data.frame()
 }
 
+#------------------------------------------------------------------------------------------
+# Prepare data
+#------------------------------------------------------------------------------------------
+# Get UP and DOWN-regulated 
+UP <- DEA.annot %>% 
+  dplyr::filter(DEG == "Upregulated") %>% 
+  dplyr::select(Geneid) %>% 
+  pull %>%
+  bitr(fromType = "SYMBOL",toType = c("ENTREZID"), OrgDb = db) %>%
+  pull(ENTREZID)
+
+DWN <- DEA.annot %>% 
+  dplyr::filter(DEG == "Downregulated") %>% 
+  dplyr::select(Geneid) %>% 
+  pull %>%
+  bitr(fromType = "SYMBOL",toType = c("ENTREZID"), OrgDb = db) %>%
+  pull(ENTREZID)
+
+# Get universe of genes. Genes that have been considered for differential expression.
+if (set_universe == TRUE) {
+  universe <- DEA.annot %>%
+    mutate(max_fpkm = purrr::reduce(dplyr::select(., contains("_FPKM")), pmax)) %>%
+    dplyr::filter(max_fpkm > fpkm) %>%
+    dplyr::select(Geneid) %>% 
+    pull %>%
+    bitr(fromType = "SYMBOL", toType = c("ENTREZID"), OrgDb = db) %>%
+    pull(ENTREZID)
+} else {
+  universe <- DEA.annot %>%
+    dplyr::select(Geneid) %>% 
+    pull %>%
+    bitr(fromType = "SYMBOL", toType = c("ENTREZID"), OrgDb = db) %>%
+    pull(ENTREZID)
+}
 
 #------------------------------------------------------------------------------------------
 # Perform enrichments
