@@ -5,6 +5,7 @@ sink(log, type = "message")
 library(tidyverse)
 library(clusterProfiler)
 library(ReactomePA)
+library(org.Hs.eg.db)
 library(org.Mm.eg.db)
 library(openxlsx)
 library(msigdbr)
@@ -62,20 +63,23 @@ if (genome == "mouse") {
   kegg.genome <- "mmu"
   pa.genome   <- "mouse"
   db          <- "org.Mm.eg.db"
+  m_df.h      <- msigdbr(species = "Mus musculus", category = "H") %>%
+                   dplyr::select(gs_name, entrez_gene) %>%
+                   as.data.frame()
+  m_df.c2     <- msigdbr(species = "Mus musculus", category = "C2") %>%
+                   dplyr::select(gs_name, entrez_gene) %>%
+                   as.data.frame()
 } else if (genome == "human") {
   kegg.genome <- "hsa"
   pa.genome   <- "human"
   db          <- "org.Hs.eg.db"
+  m_df.h      <- msigdbr(species = "Homo sapiens", category = "H") %>%
+                   dplyr::select(gs_name, entrez_gene) %>%
+                   as.data.frame()
+  m_df.c2     <- msigdbr(species = "Homo sapiens", category = "C2") %>%
+                   dplyr::select(gs_name, entrez_gene) %>%
+                   as.data.frame()
 }
-
-# Define gene sets for hypergeometric msigdb test
-m_df.h <- msigdbr(species = "Mus musculus", category = "H") %>%
-dplyr::select(gs_name, entrez_gene) %>%
-as.data.frame()
-
-m_df.c2 <- msigdbr(species = "Mus musculus", category = "C2") %>%
-dplyr::select(gs_name, entrez_gene) %>%
-as.data.frame()
 
 
 #------------------------------------------------------------------------------------------
