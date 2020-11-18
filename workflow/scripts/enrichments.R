@@ -5,6 +5,7 @@ sink(log, type = "message")
 library(tidyverse)
 library(clusterProfiler)
 library(ReactomePA)
+library(org.Hs.eg.db)
 library(org.Mm.eg.db)
 library(openxlsx)
 library(msigdbr)
@@ -22,6 +23,30 @@ qvalue       <- as.numeric(snakemake@params[["qvalue"]])
 fpkm         <- as.numeric(snakemake@wildcards[["fpkm"]])
 set_universe <- as.logical(snakemake@params[["set_universe"]])
 
+
+# Set mouse or human references for the databases
+if (genome == "mouse") { 
+  kegg.genome <- "mmu"
+  pa.genome   <- "mouse"
+  db          <- "org.Mm.eg.db"
+  m_df.h      <- msigdbr(species = "Mus musculus", category = "H") %>%
+                   dplyr::select(gs_name, entrez_gene) %>%
+                   as.data.frame()
+  m_df.c2     <- msigdbr(species = "Mus musculus", category = "C2") %>%
+                   dplyr::select(gs_name, entrez_gene) %>%
+                   as.data.frame()
+} else if (genome == "human") {
+  kegg.genome <- "hsa"
+  pa.genome   <- "human"
+  db          <- "org.Hs.eg.db"
+  m_df.h      <- msigdbr(species = "Homo sapiens", category = "H") %>%
+                   dplyr::select(gs_name, entrez_gene) %>%
+                   as.data.frame()
+  m_df.c2     <- msigdbr(species = "Homo sapiens", category = "C2") %>%
+                   dplyr::select(gs_name, entrez_gene) %>%
+                   as.data.frame()
+}
+
 #------------------------------------------------------------------------------------------
 # Prepare data
 #------------------------------------------------------------------------------------------
@@ -30,14 +55,14 @@ UP <- DEA.annot %>%
   dplyr::filter(DEG == "Upregulated") %>% 
   dplyr::select(Geneid) %>% 
   pull %>%
-  bitr(fromType = "SYMBOL",toType = c("ENTREZID"), OrgDb = org.Mm.eg.db) %>%
+  bitr(fromType = "SYMBOL",toType = c("ENTREZID"), OrgDb = db) %>%
   pull(ENTREZID)
 
 DWN <- DEA.annot %>% 
   dplyr::filter(DEG == "Downregulated") %>% 
   dplyr::select(Geneid) %>% 
   pull %>%
-  bitr(fromType = "SYMBOL",toType = c("ENTREZID"), OrgDb = org.Mm.eg.db) %>%
+  bitr(fromType = "SYMBOL",toType = c("ENTREZID"), OrgDb = db) %>%
   pull(ENTREZID)
 
 # Get universe of genes. Genes that have been considered for differential expression.
@@ -47,36 +72,15 @@ if (set_universe == TRUE) {
     dplyr::filter(max_fpkm > fpkm) %>%
     dplyr::select(Geneid) %>% 
     pull %>%
-    bitr(fromType = "SYMBOL", toType = c("ENTREZID"), OrgDb = org.Mm.eg.db) %>%
+    bitr(fromType = "SYMBOL", toType = c("ENTREZID"), OrgDb = db) %>%
     pull(ENTREZID)
 } else {
   universe <- DEA.annot %>%
     dplyr::select(Geneid) %>% 
     pull %>%
-    bitr(fromType = "SYMBOL", toType = c("ENTREZID"), OrgDb = org.Mm.eg.db) %>%
+    bitr(fromType = "SYMBOL", toType = c("ENTREZID"), OrgDb = db) %>%
     pull(ENTREZID)
 }
-
-# Set mouse or human references for the databases
-if (genome == "mouse") { 
-  kegg.genome <- "mmu"
-  pa.genome   <- "mouse"
-  db          <- "org.Mm.eg.db"
-} else if (genome == "human") {
-  kegg.genome <- "hsa"
-  pa.genome   <- "human"
-  db          <- "org.Hs.eg.db"
-}
-
-# Define gene sets for hypergeometric msigdb test
-m_df.h <- msigdbr(species = "Mus musculus", category = "H") %>%
-dplyr::select(gs_name, entrez_gene) %>%
-as.data.frame()
-
-m_df.c2 <- msigdbr(species = "Mus musculus", category = "C2") %>%
-dplyr::select(gs_name, entrez_gene) %>%
-as.data.frame()
-
 
 #------------------------------------------------------------------------------------------
 # Perform enrichments
