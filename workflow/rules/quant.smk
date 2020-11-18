@@ -56,10 +56,6 @@ rule salmon_index:
         "results/00log/salmonIndex/log"
     threads:
         CLUSTER["salmon_index"]["cpu"]
-    shadow: 
-        "minimal"
-    benchmark:
-        "index_benchmark.txt"
     shell:
         """
         grep "^>" <(gunzip -c {input.primary_assembly}) \
