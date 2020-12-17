@@ -12,11 +12,11 @@ rule salmon_index:
     shell:
         """
         grep "^>" <(gunzip -c {input.primary_assembly}) \
-        | cut -d " " -f 1 > {output}/decoys.txt
-        sed -i.bak -e 's/>//g' {output}/decoys.txt
-        cat {input.transcripts} {input.primary_assembly} > {output}/gentrome.fa.gz
-        salmon index -t {output}/gentrome.fa.gz -d {output}/decoys.txt -p {threads} -i {output} --gencode
-        rm {output}/decoys.txt {output}/gentrome.fa.gz
+        | cut -d " " -f 1 > decoys.txt
+        sed -i.bak -e 's/>//g' decoys.txt
+        cat {input.transcripts} {input.primary_assembly} > gentrome.fa.gz
+        salmon index -t gentrome.fa.gz -d decoys.txt -p {threads} -i {output} --gencode
+        rm decoys.txt gentrome.fa.gz
         """
 
 
