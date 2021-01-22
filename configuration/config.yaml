@@ -62,7 +62,9 @@ pca:
   labels:
     # columns of sample sheet to use for PCA
     - condition
-
+  # Number of top variable genes to show in PCA. Default is 500
+  ntop: 500
+    
 
 diffexp:
   # samples to ignore. Write the name of the sample
