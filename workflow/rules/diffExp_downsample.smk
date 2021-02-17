@@ -59,7 +59,8 @@ rule pca_downsampled:
         "results/04deseq2/downsampled/pca.pdf",
         "results/04deseq2/downsampled/pca_names.pdf"
     params:
-        pca_labels = config["pca"]["labels"]
+        pca_labels = config["pca"]["labels"],
+        ntop_genes = config["pca"]["ntop"]
     log:
         "results/00log/pca.log"
     script:
