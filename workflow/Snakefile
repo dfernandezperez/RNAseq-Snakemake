@@ -54,7 +54,7 @@ else:
 #-----------------------------------------------------------------------------------------------------------------------
 rule all: 
     input:
-        "results/04deseq2/pca.pdf",
+        expand("results/04deseq2/pca_top{ntop}.pdf", ntop = config["pca"]["ntop"]),
         "results/01qc/multiqc/multiqc_report.html",
         expand("results/05bigwig/{sample}.bw", sample = SAMPLES),
         enrichments,

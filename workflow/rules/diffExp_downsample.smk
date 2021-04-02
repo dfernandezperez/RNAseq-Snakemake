@@ -53,14 +53,13 @@ rule pca_downsampled:
     input:
         rules.deseq2_downsampled.output.rds
     output:
-        "results/04deseq2/downsampled/pca_elipse_names.pdf",
-        "results/04deseq2/downsampled/pca.pdf",
-        "results/04deseq2/downsampled/pca_names.pdf"
+        "results/04deseq2/downsampled/pca_elipse_names_top{ntop}.pdf",
+        "results/04deseq2/downsampled/pca_top{ntop}.pdf",
+        "results/04deseq2/downsampled/pca_names_top{ntop}.pdf"
     params:
         pca_labels = config["pca"]["labels"],
-        ntop_genes = config["pca"]["ntop"]
     log:
-        "results/00log/pca.log"
+        "results/00log/downsampled/pca_{ntop}.log"
     script:
         "../scripts/plot-PCA.R"
 

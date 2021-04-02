@@ -52,14 +52,13 @@ rule pca:
     input:
         rules.deseq2.output.rds
     output:
-        "results/04deseq2/pca_elipse_names.pdf",
-        "results/04deseq2/pca.pdf",
-        "results/04deseq2/pca_names.pdf"
+        "results/04deseq2/pca_elipse_names_top{ntop}.pdf",
+        "results/04deseq2/pca_top{ntop}.pdf",
+        "results/04deseq2/pca_names_top{ntop}.pdf"
     params:
         pca_labels = config["pca"]["labels"],
-        ntop_genes = config["pca"]["ntop"]
     log:
-        "results/00log/pca.log"
+        "results/00log/pca_{ntop}.log"
     script:
         "../scripts/plot-PCA.R"
 

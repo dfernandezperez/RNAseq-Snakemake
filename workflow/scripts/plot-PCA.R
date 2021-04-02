@@ -12,7 +12,7 @@ library("ggforce")
 # Read parameters
 #------------------------------------------------------------------------------------------
 # Define number of genes to perform PCA
-ntop <- as.numeric(snakemake@params[["ngenes_pca"]])
+ntop <- as.numeric(snakemake@wildcards[["ntop"]])
 
 # group variable set in config.yaml
 grouping <- snakemake@params[["pca_labels"]]
