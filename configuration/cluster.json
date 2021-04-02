@@ -7,7 +7,7 @@
 		"jname"       : "{rule}",
 		"output"      : "results/.clusterLogs/{rule}.{wildcards}.out",
 		"error"       : "results/.clusterLogs/{rule}.{wildcards}.err",
-		"MaxMem"      : 8
+		"MaxMem"      : 4
 	},
 	"fastp_pe" :
 	{
