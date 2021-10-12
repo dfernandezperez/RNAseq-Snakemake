@@ -42,5 +42,13 @@
 	"bam2bigwig":
 	{
 		"cpu" : 1
+	},
+	"enrichments":
+	{
+		"MaxMem" : 8
+	},
+	"enrichments_downsampled":
+	{
+		"MaxMem" : 8
 	}
 }

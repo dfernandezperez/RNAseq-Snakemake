@@ -81,7 +81,7 @@ rule enrichments_downsampled:
     input:
         rules.filter_deg_downsampled.output
     output:
-        enrichments = "results/04deseq2/downsampled/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_enrichments_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.xls",
+        enrichments = "results/04deseq2/downsampled/{contrast}/log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}/{contrast}_enrichments_log2fc{log2fc}_pval{pvalue}_fpkm{fpkm}.xlsx",
     params:
         genome       = config["ref"]["genome"],
         pvalue       = config["enrichments"]["pval"],
